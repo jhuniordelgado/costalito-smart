@@ -1,83 +1,71 @@
 # Costalito Smart
 
-> **Sistema Inteligente de Gestión Comercial Autogestionable para Graneros**
+Sistema Inteligente de Gestión Comercial Autogestionable para Graneros.
 
-Proyecto desarrollado para la asignatura **Arquitectura de Software** de la **Universidad Manuela Beltrán**.
+Proyecto de Arquitectura de Software — Universidad Manuela Beltrán.
 
 ## Descripción
 
-Costalito Smart es una propuesta de arquitectura para un sistema ERP autogestionable que busca modernizar la gestión comercial de graneros familiares. El sistema integra módulos operativos con un motor inteligente de decisiones que analiza la información del negocio para generar predicciones, clasificar riesgos, detectar anomalías y recomendar acciones de mejora.
+Costalito Smart es un prototipo de ERP para graneros familiares. Busca integrar inventario, ventas, clientes, proveedores, reportes y un futuro motor inteligente de decisiones.
 
-## Problemática
+## Avance de la Fase 2
 
-Actualmente muchos graneros administran inventarios, ventas, compras y fiados mediante procesos manuales o herramientas independientes. Esto ocasiona:
+Se evolucionó la propuesta de la Fase 1 hacia un frontend navegable desarrollado en Angular.
 
-* Duplicidad de información.
-* Errores en los registros.
-* Pérdida de datos.
-* Dificultad para tomar decisiones oportunas.
-* Falta de integración entre las operaciones del negocio.
+El prototipo incluye:
 
-## Objetivo
+- Dashboard con indicadores y alertas.
+- Navegación entre módulos.
+- Inventario, ventas, clientes, proveedores y reportes.
+- Módulo visual de inteligencia de negocio.
+- Administración de usuarios, roles y configuración.
+- Formularios, tablas, botones y datos de prueba.
 
-Diseñar una arquitectura de software para un sistema ERP inteligente que apoye la gestión de un granero familiar, integrando componentes de operación y un motor inteligente de decisiones bajo el modelo arquitectónico 4+1.
+Por ahora no hay base de datos ni lógica de negocio completa. SQL Server, ASP.NET Core y Python/TensorFlow se implementarán en fases posteriores.
 
-## Arquitectura propuesta
+## Arquitectura inicial
 
-La solución está organizada en cuatro componentes principales:
+La estructura principal del frontend es:
 
-1. **Usuarios** (propietario, empleado y administrador).
-2. **Interfaz Web**, desde donde se gestionan las operaciones.
-3. **Costalito Smart**, compuesto por módulos operativos y un motor inteligente de decisiones.
-4. **Base de datos SQL Server**, encargada de almacenar la información del negocio.
+- pages: pantallas del sistema.
+- app.routes.ts: navegación entre módulos.
+- app.ts: componente principal.
+- styles.css: estilos globales.
 
-### Flujo general de información
+La organización representa una separación inicial de responsabilidades:
 
-El usuario registra información desde la interfaz web, la cual es almacenada en la base de datos. Posteriormente, el motor inteligente analiza los datos disponibles para generar predicciones, clasificaciones de riesgo, detección de anomalías y recomendaciones. Los resultados regresan al dashboard para apoyar la toma de decisiones y el proceso se actualiza continuamente con los nuevos registros del sistema.
-
-## Funcionalidades previstas
-
-* Gestión de inventario.
-* Registro de ventas.
-* Gestión de compras.
-* Administración de clientes y fiados.
-* Gestión de proveedores.
-* Reportes y dashboard.
-* Predicción de demanda.
-* Clasificación del riesgo de fiados.
-* Detección de anomalías.
-* Recomendaciones inteligentes.
+- Modelo: Producto, Venta, Cliente, Proveedor y Usuario.
+- Vista: componentes Angular y plantillas HTML.
+- Controlador: componentes TypeScript, rutas y futuros servicios.
 
 ## Tecnologías
 
-| Tecnología           | Propósito                    |
-| -------------------- | ---------------------------- |
-| HTML5                | Interfaz inicial             |
-| CSS3                 | Diseño visual                |
-| JavaScript           | Interactividad               |
-| ASP.NET              | Desarrollo del sistema       |
-| SQL Server           | Base de datos                |
-| Prophet              | Predicción de demanda        |
-| Random Forest        | Clasificación de riesgo      |
-| Isolation Forest     | Detección de anomalías       |
-| Power BI             | Visualización de indicadores |
-| Enterprise Architect | Modelado arquitectónico      |
+- Angular y TypeScript: frontend navegable.
+- HTML y CSS: diseño de la interfaz.
+- C# / ASP.NET Core: backend proyectado.
+- SQL Server: base de datos proyectada.
+- Python / TensorFlow: inteligencia artificial proyectada.
 
-## Estado del proyecto
+## Ejecución
 
-Esta primera etapa corresponde al inicio del desarrollo e incluye:
+Requisitos: Node.js y Angular CLI instalados.
 
-* Repositorio en GitHub.
-* Estructura inicial del proyecto.
-* Documentación base.
-* Preparación del Front-End.
-* Desarrollo progresivo mediante commits.
+1. Abrir una terminal en la carpeta frontend.
+2. Ejecutar: cd frontend
+3. Ejecutar: npm install
+4. Ejecutar: ng serve
+5. Abrir en el navegador: http://localhost:4200
 
-## Equipo
+## Trazabilidad
 
-* John Alejandro Celis
-* Sebastián Cabanzo
-* Jhunior Estiven Delgado
+Fase 1: Idea y propuesta inicial.  
+Fase 2: Prototipo estructurado y navegable en Angular.  
+Fases posteriores: Backend, base de datos e inteligencia artificial.
 
-**Universidad Manuela Beltrán – Ingeniería de Sistemas – Arquitectura de Software**
+## Equipo de trabajo
 
+- John Alejandro Celis
+- Sebastián Cabanzo
+- Jhunior Estiven Delgado
+
+Universidad Manuela Beltrán — Ingeniería de Sistemas
