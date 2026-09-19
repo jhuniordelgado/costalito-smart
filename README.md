@@ -48,13 +48,17 @@ La organización representa una separación inicial de responsabilidades:
 
 ## Ejecución
 
-Requisitos: Node.js y Angular CLI instalados.
-
-1. Abrir una terminal en la carpeta frontend.
-2. Ejecutar: cd frontend
-3. Ejecutar: npm install
-4. Ejecutar: ng serve
-5. Abrir en el navegador: http://localhost:4200
+Requisitos: Git, Node.js y Angular CLI instalados.
+1. Clonar el repositorio:
+   git clone https://github.com/jhuniordelgado/costalito-smart.git
+2. Entrar a la carpeta del frontend:
+   cd costalito-smart/frontend
+3. Instalar las dependencias:
+   npm install
+4. Ejecutar el proyecto:
+   ng serve -o
+5. Si el navegador no se abre automáticamente, abrir:
+   http://localhost:4200
 
 ## Trazabilidad
 
