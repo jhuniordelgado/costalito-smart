@@ -1,0 +1,66 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Gestión operativa</p>
+    <h2>Ventas</h2>
+    <p>Visualiza las ventas registradas durante la jornada.</p>
+  </div>
+  <button class="primary-button">+ Registrar venta</button>
+</header>
+
+<section class="metrics">
+  <article class="metric-card">
+    <span class="metric-icon green">💵</span>
+    <div>
+      <p>Ventas de hoy</p>
+      <strong>$ 1.580.000</strong>
+      <small class="positive">↑ 12% frente a ayer</small>
+    </div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon blue">🧾</span>
+    <div>
+      <p>Transacciones</p>
+      <strong>84</strong>
+      <small class="positive">↑ 7 ventas nuevas</small>
+    </div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon orange">🛒</span>
+    <div>
+      <p>Ticket promedio</p>
+      <strong>$ 18.810</strong>
+      <small class="warning">Datos de prueba</small>
+    </div>
+  </article>
+</section>
+
+<section class="module-card" style="margin-top: 24px;">
+  <div class="toolbar">
+    <input type="search" placeholder="Buscar por cliente o número de venta..." />
+    <select>
+      <option>Ventas de hoy</option>
+      <option>Esta semana</option>
+      <option>Este mes</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Factura</th>
+          <th>Cliente</th>
+          <th>Hora</th>
+          <th>Total</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>#V-1024</strong></td><td>Cliente mostrador</td><td>10:15 a. m.</td><td>$ 32.500</td><td><span class="badge success">Efectivo</span></td></tr>
+        <tr><td><strong>#V-1023</strong></td><td>María Gómez</td><td>09:50 a. m.</td><td>$ 48.200</td><td><span class="badge success">Nequi</span></td></tr>
+        <tr><td><strong>#V-1022</strong></td><td>Carlos Rojas</td><td>09:22 a. m.</td><td>$ 18.000</td><td><span class="badge warning-badge">Fiado</span></td></tr>
+        <tr><td><strong>#V-1021</strong></td><td>Cliente mostrador</td><td>08:43 a. m.</td><td>$ 25.700</td><td><span class="badge success">Efectivo</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>

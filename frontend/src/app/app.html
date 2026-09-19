@@ -1,0 +1,37 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">CS</div>
+      <div>
+        <h1>Costalito Smart</h1>
+        <p>ERP Autogestionable</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a routerLink="/" routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">🏠 <span>Inicio</span></a>
+      <a routerLink="/inventario" routerLinkActive="active">📦 <span>Inventario</span></a>
+      <a routerLink="/ventas" routerLinkActive="active">💰 <span>Ventas</span></a>
+      <a routerLink="/clientes" routerLinkActive="active">👥 <span>Clientes</span></a>
+      <a routerLink="/proveedores" routerLinkActive="active">🚚 <span>Proveedores</span></a>
+      <a routerLink="/reportes" routerLinkActive="active">📊 <span>Reportes</span></a>
+      <a routerLink="/inteligencia" routerLinkActive="active">🧠 <span>Inteligencia</span></a>
+      <a routerLink="/administracion" routerLinkActive="active">
+        ⚙️ <span>Administración</span>
+      </a>
+    </nav>
+
+    <div class="user-card">
+      <div class="avatar">JC</div>
+      <div>
+        <strong>Administrador</strong>
+        <span>Granero Costalito</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

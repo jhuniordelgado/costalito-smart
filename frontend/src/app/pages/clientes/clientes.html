@@ -1,0 +1,65 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Gestión comercial</p>
+    <h2>Clientes</h2>
+    <p>Administra la información de clientes y sus saldos de fiado.</p>
+  </div>
+  <button class="primary-button">+ Nuevo cliente</button>
+</header>
+
+<section class="metrics">
+  <article class="metric-card">
+    <span class="metric-icon blue">👥</span>
+    <div>
+      <p>Clientes registrados</p>
+      <strong>312</strong>
+      <small class="positive">↑ 6 nuevos este mes</small>
+    </div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon orange">📒</span>
+    <div>
+      <p>Fiados activos</p>
+      <strong>28</strong>
+      <small class="warning">Requieren seguimiento</small>
+    </div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon red">⚠️</span>
+    <div>
+      <p>Saldo pendiente</p>
+      <strong>$ 865.000</strong>
+      <small class="warning">Datos de prueba</small>
+    </div>
+  </article>
+</section>
+
+<section class="module-card" style="margin-top: 24px;">
+  <div class="toolbar">
+    <input type="search" placeholder="Buscar cliente..." />
+    <select>
+      <option>Todos los clientes</option>
+      <option>Con fiado activo</option>
+      <option>Con saldo vencido</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Fiado actual</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>María Gómez</strong></td><td>300 555 1020</td><td>$ 185.000</td><td><span class="badge danger">Límite superado</span></td></tr>
+        <tr><td><strong>Carlos Rojas</strong></td><td>310 204 5780</td><td>$ 78.000</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
+        <tr><td><strong>Laura Martínez</strong></td><td>315 881 2290</td><td>$ 0</td><td><span class="badge success">Al día</span></td></tr>
+        <tr><td><strong>Andrés Torres</strong></td><td>320 490 1643</td><td>$ 42.000</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
