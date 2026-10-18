@@ -1,3 +1,16 @@
+:root {
+  /* Identidad visual de Costalito Smart */
+  --color-primario: #123d72;
+  --color-primario-oscuro: #09264a;
+  --color-secundario: #0e7490;
+  --color-acento: #39b98c;
+  --color-fondo: #f4f7fb;
+  --color-texto: #1d2939;
+  --color-exito: #087f5b;
+  --color-alerta: #b45309;
+  --color-error: #d6336c;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,8 +20,8 @@ body {
   margin: 0;
   min-height: 100%;
   font-family: Arial, Helvetica, sans-serif;
-  background: #f4f7fb;
-  color: #1d2939;
+  background: var(--color-fondo);
+  color: var(--color-texto);
 }
 
 button,
@@ -20,9 +33,8 @@ select {
 .app-shell {
   display: flex;
   min-height: 100vh;
-  background: #f4f7fb;
+  background: var(--color-fondo);
 }
-
 /* Barra lateral */
 
 .sidebar {
@@ -32,7 +44,7 @@ select {
   display: flex;
   flex-direction: column;
   color: #ffffff;
-  background: linear-gradient(180deg, #123d72 0%, #09264a 100%);
+  background: linear-gradient(180deg, var(--color-primario) 0%, var(--color-primario-oscuro) 100%);
 }
 
 .brand {
@@ -49,7 +61,7 @@ select {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: #39b98c;
+  background: var(--color-acento);
   color: #ffffff;
   font-size: 14px;
   font-weight: 800;
@@ -136,7 +148,6 @@ select {
   color: #b7c8df;
   font-size: 11px;
 }
-
 /* Contenido principal */
 
 .main-content {
@@ -201,7 +212,6 @@ select {
     font-size: 11px;
     font-weight: 700;
   }
-
 /* Bienvenida */
 
 .welcome-card {
@@ -236,7 +246,6 @@ select {
 .welcome-icon {
   font-size: 72px;
 }
-
 /* Indicadores */
 
 .metrics {
@@ -310,7 +319,6 @@ select {
 .warning {
   color: #d9480f;
 }
-
 /* Paneles inferiores */
 
 .content-grid {
@@ -422,7 +430,6 @@ select {
   font-size: 12px;
   line-height: 1.4;
 }
-
 /* Adaptación a pantallas pequeñas */
 
 @media (max-width: 1100px) {
@@ -480,6 +487,7 @@ select {
     font-size: 24px;
   }
 }
+
 .page-header {
   display: flex;
   align-items: flex-start;
