@@ -1,70 +1,86 @@
 # Costalito Smart
 
-Sistema Inteligente de Gestión Comercial Autogestionable para Graneros.
+Prototipo de gestión comercial para un granero familiar.
 
 Proyecto de Arquitectura de Software — Universidad Manuela Beltrán.
 
 ## Descripción
 
-Costalito Smart es un prototipo de ERP para graneros familiares. Busca integrar inventario, ventas, clientes, proveedores, reportes y un futuro motor inteligente de decisiones.
+Costalito Smart es un prototipo de ERP para apoyar la gestión diaria de un granero familiar. Reúne en una misma interfaz la consulta de inventario, ventas, compras, clientes, proveedores, créditos, reportes y alertas operativas.
 
-## Avance de la Fase 2
+## Avance actual
 
 Se evolucionó la propuesta de la Fase 1 hacia un frontend navegable desarrollado en Angular.
 
 El prototipo incluye:
 
-- Dashboard con indicadores y alertas.
-- Navegación entre módulos.
-- Inventario, ventas, clientes, proveedores y reportes.
-- Módulo visual de inteligencia de negocio.
-- Administración de usuarios, roles y configuración.
-- Formularios, tablas, botones y datos de prueba.
+- Dashboard con indicadores y alertas para el seguimiento diario.
+- Navegación entre los módulos del sistema.
+- Inventario, ventas, compras, clientes, proveedores, créditos y pagos.
+- Reportes y módulo visual de alertas y análisis.
+- Administración de usuarios, roles y parámetros iniciales.
+- Formularios, filtros, tablas, tarjetas y datos de prueba coherentes con un granero pequeño.
 
-Por ahora no hay base de datos ni lógica de negocio completa. SQL Server, ASP.NET Core y Python/TensorFlow se implementarán en fases posteriores.
+La aplicación presenta datos de prueba y no guarda información. En esta etapa no se implementan base de datos, backend, autenticación ni análisis predictivo automático. Estas capacidades se contemplan para fases posteriores.
 
-## Arquitectura inicial
+## Organización del frontend
 
 La estructura principal del frontend es:
 
-- pages: pantallas del sistema.
-- app.routes.ts: navegación entre módulos.
-- app.ts: componente principal.
-- styles.css: estilos globales.
+- `pages/`: pantallas organizadas por módulo funcional.
+- `shared/sidebar/`: menú lateral reutilizable y visible en toda la aplicación.
+- `app.routes.ts`: definición de rutas y navegación.
+- `app.ts`: componente raíz de la aplicación.
+- `styles.css`: estilos globales y paleta visual.
 
-La organización representa una separación inicial de responsabilidades:
+Esta organización representa una primera separación de responsabilidades entre presentación, navegación y componentes visuales reutilizables. Mantiene coherencia con la arquitectura de tres capas y el patrón MVC propuestos para las siguientes fases del proyecto.
 
-- Modelo: Producto, Venta, Cliente, Proveedor y Usuario.
-- Vista: componentes Angular y plantillas HTML.
-- Controlador: componentes TypeScript, rutas y futuros servicios.
+## Identidad visual
 
-## Tecnologías
+La interfaz utiliza una paleta consistente: azul para la identidad y navegación, turquesa para acciones principales, verde para confirmaciones, naranja para pendientes y rojo para alertas. El identificador `CS` y el nombre de Costalito Smart permanecen visibles en el menú lateral.
 
-- Angular y TypeScript: frontend navegable.
-- HTML y CSS: diseño de la interfaz.
-- C# / ASP.NET Core: backend proyectado.
-- SQL Server: base de datos proyectada.
-- Python / TensorFlow: inteligencia artificial proyectada.
+## Tecnologías utilizadas
+
+- Angular y TypeScript para el frontend navegable.
+- HTML y CSS para la estructura y el diseño visual.
+- Python, pandas y scikit-learn como tecnologías propuestas para un componente predictivo futuro.
 
 ## Ejecución
 
-Requisitos: Git, Node.js y Angular CLI instalados.
+Requisitos: Git y Node.js.
+
 1. Clonar el repositorio:
+
+   ```powershell
    git clone https://github.com/jhuniordelgado/costalito-smart.git
-2. Entrar a la carpeta del frontend:
+   ```
+
+2. Entrar a la carpeta del frontend e instalar dependencias:
+
+   ```powershell
    cd costalito-smart/frontend
-3. Instalar las dependencias:
    npm install
-4. Ejecutar el proyecto:
-   ng serve -o
-5. Si el navegador no se abre automáticamente, abrir:
-   http://localhost:4200
+   ```
+
+3. Ejecutar el prototipo:
+
+   ```powershell
+   npm start
+   ```
+
+4. Abrir `http://localhost:4200` en el navegador.
+
+5. Para validar la compilación de producción:
+
+   ```powershell
+   npm run build
+   ```
 
 ## Trazabilidad
 
-Fase 1: Idea y propuesta inicial.  
-Fase 2: Prototipo estructurado y navegable en Angular.  
-Fases posteriores: Backend, base de datos e inteligencia artificial.
+- Fase 1: idea y propuesta inicial.
+- Fase 2: prototipo Angular estructurado y navegable.
+- Fases posteriores: persistencia de datos, reglas de negocio y análisis predictivo, según los requisitos definidos.
 
 ## Equipo de trabajo
 
