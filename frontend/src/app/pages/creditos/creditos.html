@@ -1,0 +1,40 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Control de obligaciones</p>
+    <h2>Créditos y pagos</h2>
+    <p>Consulta los saldos pendientes de clientes y proveedores.</p>
+  </div>
+  <button class="primary-button" type="button">+ Registrar abono</button>
+</header>
+
+<section class="metrics">
+  <article class="metric-card">
+    <span class="metric-icon orange">🤝</span>
+    <div><p>Por cobrar</p><strong>$ 214.800</strong><small class="warning">9 créditos pendientes</small></div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon red">📄</span>
+    <div><p>Por pagar</p><strong>$ 318.000</strong><small class="warning">1 compra pendiente</small></div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon green">✅</span>
+    <div><p>Abonos del mes</p><strong>$ 128.000</strong><small class="positive">Datos de prueba</small></div>
+  </article>
+</section>
+
+<section class="module-card" style="margin-top: 24px;">
+  <div class="toolbar">
+    <input type="search" placeholder="Buscar cliente, proveedor o comprobante..." />
+    <select aria-label="Filtrar obligaciones"><option>Todos los saldos</option><option>Por cobrar</option><option>Por pagar</option></select>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead><tr><th>Responsable</th><th>Tipo</th><th>Documento</th><th>Saldo</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td><strong>María Gómez</strong></td><td>Por cobrar</td><td>Venta #V-1022</td><td>$ 48.200</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
+        <tr><td><strong>Carlos Rojas</strong></td><td>Por cobrar</td><td>Venta #V-1017</td><td>$ 36.000</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
+        <tr><td><strong>Aseo Total</strong></td><td>Por pagar</td><td>Compra #C-202</td><td>$ 318.000</td><td><span class="badge danger">Por revisar</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>

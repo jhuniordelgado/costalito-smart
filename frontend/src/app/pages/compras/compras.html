@@ -1,0 +1,44 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Gestión de abastecimiento</p>
+    <h2>Compras</h2>
+    <p>Consulta las compras registradas para abastecer el granero.</p>
+  </div>
+  <button class="primary-button" type="button">+ Registrar compra</button>
+</header>
+
+<section class="metrics">
+  <article class="metric-card">
+    <span class="metric-icon blue">🧾</span>
+    <div><p>Compras del mes</p><strong>$ 2.760.000</strong><small class="warning">Datos de prueba</small></div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon green">🚚</span>
+    <div><p>Proveedores activos</p><strong>12</strong><small class="positive">Disponibles para abastecimiento</small></div>
+  </article>
+  <article class="metric-card">
+    <span class="metric-icon orange">📦</span>
+    <div><p>Productos recibidos</p><strong>186</strong><small class="warning">Unidades registradas este mes</small></div>
+  </article>
+</section>
+
+<section class="module-card" style="margin-top: 24px;">
+  <div class="toolbar">
+    <input type="search" placeholder="Buscar por proveedor o número de compra..." />
+    <select aria-label="Filtrar compras">
+      <option>Compras del mes</option>
+      <option>Esta semana</option>
+      <option>Compras pendientes</option>
+    </select>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead><tr><th>Compra</th><th>Proveedor</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td><strong>#C-204</strong></td><td>Distribuciones La 14</td><td>17 oct. 2026</td><td>$ 840.000</td><td><span class="badge success">Recibida</span></td></tr>
+        <tr><td><strong>#C-203</strong></td><td>Lácteos del Valle</td><td>15 oct. 2026</td><td>$ 426.500</td><td><span class="badge success">Recibida</span></td></tr>
+        <tr><td><strong>#C-202</strong></td><td>Aseo Total</td><td>12 oct. 2026</td><td>$ 318.000</td><td><span class="badge warning-badge">Pendiente de pago</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
