@@ -60,39 +60,40 @@
     <p>Selecciona una señal y actúa sin perder el hilo de tu jornada.</p>
   </div>
 
-  <div class="focus-switch" role="tablist" aria-label="Señales de la jornada">
-    <button id="ventas-tab" type="button"
-            [class.active]="vistaActiva === 'ventas'"
-            (click)="cambiarVista('ventas')"
-            role="tab"
-            aria-controls="signal-panel"
-            [attr.aria-selected]="vistaActiva === 'ventas'">
-      Ventas <span>01</span>
-    </button>
+  <div class="focus-stage">
+    <div class="focus-switch" role="tablist" aria-label="Señales de la jornada">
+      <button id="ventas-tab" type="button"
+              [class.active]="vistaActiva === 'ventas'"
+              (click)="cambiarVista('ventas')"
+              role="tab"
+              aria-controls="signal-panel"
+              [attr.aria-selected]="vistaActiva === 'ventas'">
+        Ventas <span>01</span>
+      </button>
 
-    <button id="inventario-tab" type="button"
-            [class.active]="vistaActiva === 'inventario'"
-            (click)="cambiarVista('inventario')"
-            role="tab"
-            aria-controls="signal-panel"
-            [attr.aria-selected]="vistaActiva === 'inventario'">
-      Existencias <span>02</span>
-    </button>
+      <button id="inventario-tab" type="button"
+              [class.active]="vistaActiva === 'inventario'"
+              (click)="cambiarVista('inventario')"
+              role="tab"
+              aria-controls="signal-panel"
+              [attr.aria-selected]="vistaActiva === 'inventario'">
+        Existencias <span>02</span>
+      </button>
 
-    <button id="fiados-tab" type="button"
-            [class.active]="vistaActiva === 'fiados'"
-            (click)="cambiarVista('fiados')"
-            role="tab"
-            aria-controls="signal-panel"
-            [attr.aria-selected]="vistaActiva === 'fiados'">
-      Fiados <span>03</span>
-    </button>
-  </div>
+      <button id="fiados-tab" type="button"
+              [class.active]="vistaActiva === 'fiados'"
+              (click)="cambiarVista('fiados')"
+              role="tab"
+              aria-controls="signal-panel"
+              [attr.aria-selected]="vistaActiva === 'fiados'">
+        Fiados <span>03</span>
+      </button>
+    </div>
 
-  <article id="signal-panel" class="focus-card" role="tabpanel"
-           [attr.aria-labelledby]="vistaActiva + '-tab'"
-           [class.inventory-view]="vistaActiva === 'inventario'"
-           [class.credit-view]="vistaActiva === 'fiados'">
+    <article id="signal-panel" class="focus-card" role="tabpanel"
+             [attr.aria-labelledby]="vistaActiva + '-tab'"
+             [class.inventory-view]="vistaActiva === 'inventario'"
+             [class.credit-view]="vistaActiva === 'fiados'">
 
     @if (vistaActiva === 'ventas') {
     <p class="focus-number">+8%</p>
@@ -119,7 +120,8 @@
       <a routerLink="/creditos">Abrir fiados y pagos →</a>
     </div>
     }
-  </article>
+    </article>
+  </div>
 </section>
 
 <section class="priority-grid">
