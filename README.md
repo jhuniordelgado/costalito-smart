@@ -37,7 +37,20 @@ Esta organización representa una primera separación de responsabilidades entre
 
 ## Identidad visual
 
-La interfaz utiliza una paleta consistente: azul para la identidad y navegación, turquesa para acciones principales, verde para confirmaciones, naranja para pendientes y rojo para alertas. El identificador `CS` y el nombre de Costalito Smart permanecen visibles en el menú lateral.
+La interfaz se inspira en el costal dorado del logo: negro verdoso para la navegación, verde granero para acciones, dorado para actividad positiva y arcilla para asuntos que requieren atención. El tablero principal se organiza como una jornada de trabajo, con prioridades accionables, ventas, existencias y fiados en lugar de un dashboard genérico de tarjetas.
+
+El recurso de marca se encuentra en `frontend/public/brand/costalito-logo.jpg`. Las reglas visuales reutilizables están documentadas en `DESIGN.md`.
+
+## Preparación para la integración
+
+Actualmente el frontend usa datos de prueba para demostrar navegación y presentación. Está preparado para que el backend reemplace esos datos mediante servicios Angular, manteniendo las rutas y componentes visuales actuales.
+
+- `frontend/`: aplicación Angular, páginas y componentes compartidos.
+- `backend/`: carpeta reservada para la lógica de negocio y API REST.
+- `database/`: carpeta reservada para scripts de base de datos y datos de prueba.
+- `UX-CONTRACT.md`: guía de comportamiento para integrar formularios, validaciones, cargas y errores sin cambiar la experiencia visual.
+
+Durante la integración, las reglas de negocio, permisos, saldos y validaciones finales pertenecen al backend. El frontend debe mostrar las respuestas exitosas, los mensajes de validación y los errores de conexión sin borrar la información ya digitada.
 
 ## Tecnologías utilizadas
 

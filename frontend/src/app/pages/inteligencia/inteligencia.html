@@ -1,85 +1,48 @@
-<header class="page-header">
+<header class="page-header analysis-header">
   <div>
     <p class="eyebrow">Seguimiento del negocio</p>
-    <h2>Alertas y análisis</h2>
-    <p>Representación visual de indicadores y recomendaciones para apoyar las decisiones diarias.</p>
+    <h2>Señales que<br>piden atención.</h2>
+    <p>Lecturas operativas para decidir qué atender primero en el granero.</p>
   </div>
-
-  <span class="status">Datos de prueba</span>
+  <span class="status">Datos de prueba · hoy</span>
 </header>
 
-<section class="content-grid">
-  <article class="panel intelligence-panel">
-    <div class="panel-header">
-      <div>
-        <p class="eyebrow">Datos de prueba</p>
-        <h3>Recomendaciones para revisar</h3>
-      </div>
-    </div>
-
-    <div class="intelligence-grid">
-      <div class="intelligence-item">
-        <span>📈</span>
-        <div>
-          <strong>Productos con alta rotación</strong>
-          <p>Arroz, aceite y huevos registran mayor movimiento. Revisar existencias antes del fin de semana.</p>
-        </div>
-      </div>
-
-      <div class="intelligence-item">
-        <span>⚠️</span>
-        <div>
-          <strong>Saldos por revisar</strong>
-          <p>María Gómez y dos clientes más presentan pagos pendientes. Consultar el módulo de créditos.</p>
-        </div>
-      </div>
-
-      <div class="intelligence-item">
-        <span>🔍</span>
-        <div>
-          <strong>Variación de ventas</strong>
-          <p>Las ventas de bebidas fueron mayores durante la mañana. Comparar con los registros de otros días.</p>
-        </div>
-      </div>
-
-      <div class="intelligence-item">
-        <span>💡</span>
-        <div>
-          <strong>Inventario por revisar</strong>
-          <p>La leche entera tiene 8 unidades disponibles. Evaluar una compra a Lácteos del Valle.</p>
-        </div>
-      </div>
-    </div>
+<section class="analysis-layout" aria-label="Señales operativas de Costalito Smart">
+  <article class="analysis-lead">
+    <p class="eyebrow">Lectura del día</p>
+    <span class="analysis-mark">04</span>
+    <h3>Cuatro señales<br>para revisar.</h3>
+    <p>Los datos se muestran como una guía de prioridad. En la siguiente fase, estas señales vendrán de la API y se actualizarán con la operación real.</p>
   </article>
 
-  <article class="panel alerts-panel">
-    <p class="eyebrow">Alcance del prototipo</p>
-    <h3 style="margin-top: 6px;">Estado del análisis</h3>
+  <div class="signal-list">
+    <article class="signal-card signal-card--inventory">
+      <span class="signal-index">01 · EXISTENCIAS</span>
+      <h3>La leche entera<br>se está acabando.</h3>
+      <p>Quedan 8 unidades. Evalúa el pedido con Lácteos del Valle antes del próximo turno.</p>
+      <a routerLink="/inventario">Abrir inventario <b>→</b></a>
+    </article>
 
-    <ul class="alerts-list">
-      <li>
-        <span class="alert-dot blue-dot"></span>
-        <div>
-          <strong>Interfaz actual</strong>
-          <p>Angular presenta alertas e indicadores con datos de prueba.</p>
-        </div>
-      </li>
+    <article class="signal-card signal-card--credit">
+      <span class="signal-index">02 · FIADOS</span>
+      <h3>Hay saldos que<br>merecen una llamada.</h3>
+      <p>María Gómez y dos clientes más presentan pagos pendientes para seguimiento.</p>
+      <a routerLink="/creditos">Ver fiados y pagos <b>→</b></a>
+    </article>
 
-      <li>
-        <span class="alert-dot orange-dot"></span>
-        <div>
-          <strong>Datos de prueba</strong>
-          <p>La información no se guarda ni se analiza automáticamente todavía.</p>
-        </div>
-      </li>
+    <article class="signal-card signal-card--sales">
+      <span class="signal-index">03 · MOVIMIENTO</span>
+      <h3>Las bebidas se movieron<br>mejor esta mañana.</h3>
+      <p>Compara el detalle de ventas para decidir si necesitas reforzar la exhibición.</p>
+      <a routerLink="/ventas">Ver ventas del día <b>→</b></a>
+    </article>
+  </div>
+</section>
 
-      <li>
-        <span class="alert-dot red-dot"></span>
-        <div>
-          <strong>Fase posterior</strong>
-          <p>Se propone evaluar análisis predictivo con Python, pandas y scikit-learn.</p>
-        </div>
-      </li>
-    </ul>
-  </article>
+<section class="analysis-footnote">
+  <p class="eyebrow">Cómo leer este módulo</p>
+  <div>
+    <strong>Hoy muestra datos de prueba.</strong>
+    <p>Cuando el backend esté conectado, conservará esta vista y alimentará las señales con ventas, existencias y créditos reales.</p>
+  </div>
 </section>
