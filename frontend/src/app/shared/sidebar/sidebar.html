@@ -10,36 +10,13 @@
   </div>
 
   <nav class="menu" aria-label="Navegación principal">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      <i>01</i><span>Mi jornada</span>
+    @for (opcion of opciones; track opcion.ruta; let posicion = $index) {
+    <a [routerLink]="opcion.ruta"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: opcion.ruta === '/' }">
+      <i>{{ numero(posicion) }}</i><span>{{ opcion.nombre }}</span>
     </a>
-    <a routerLink="/ventas" routerLinkActive="active">
-      <i>02</i><span>Ventas</span>
-    </a>
-    <a routerLink="/inventario" routerLinkActive="active">
-      <i>03</i><span>Inventario</span>
-    </a>
-    <a routerLink="/compras" routerLinkActive="active">
-      <i>04</i><span>Compras</span>
-    </a>
-    <a routerLink="/clientes" routerLinkActive="active">
-      <i>05</i><span>Clientes</span>
-    </a>
-    <a routerLink="/proveedores" routerLinkActive="active">
-      <i>06</i><span>Proveedores</span>
-    </a>
-    <a routerLink="/creditos" routerLinkActive="active">
-      <i>07</i><span>Fiados y pagos</span>
-    </a>
-    <a routerLink="/reportes" routerLinkActive="active">
-      <i>08</i><span>Reportes</span>
-    </a>
-    <a routerLink="/inteligencia" routerLinkActive="active">
-      <i>09</i><span>Señales del negocio</span>
-    </a>
-    <a routerLink="/administracion" routerLinkActive="active">
-      <i>10</i><span>Ajustes</span>
-    </a>
+    }
   </nav>
 
   <div class="user-card">
