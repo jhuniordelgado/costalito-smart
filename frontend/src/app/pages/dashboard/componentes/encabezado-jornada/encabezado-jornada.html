@@ -1,0 +1,19 @@
+<header class="jornada">
+  <div class="calendario">
+    <span class="calendario-dia-semana">{{ diaSemana }}</span>
+    <strong>{{ dia }}</strong>
+    <span class="calendario-mes">{{ mes }}</span>
+  </div>
+
+  <div class="saludo">
+    <p class="nota">Granero Costalito · jornada en curso</p>
+    <h2>Que nada se te pase hoy.</h2>
+  </div>
+
+  <div class="estado">
+    <span class="sello-abierto">Abierto · {{ hora }}</span>
+    <a class="pendientes"
+       routerLink="/inteligencia"
+       [attr.aria-label]="'Revisar ' + novedades() + ' novedades'">{{ novedades() }}</a>
+  </div>
+</header> 

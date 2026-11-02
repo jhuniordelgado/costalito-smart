@@ -1,18 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-
-type VistaJornada = 'ventas' | 'inventario' | 'fiados';
+import { EncabezadoJornada } from './componentes/encabezado-jornada/encabezado-jornada';
+import { CorteDelDia } from './componentes/corte-del-dia/corte-del-dia';
+import { AtajosRapidos } from './componentes/atajos-rapidos/atajos-rapidos';
+import { SenalDestacada } from './componentes/senal-destacada/senal-destacada';
+import { ListaPrioridades } from './componentes/lista-prioridades/lista-prioridades';
 
 @Component({
-  imports: [RouterLink],
   selector: 'app-dashboard',
-  styleUrl: './dashboard.css',
+  imports: [EncabezadoJornada, CorteDelDia, AtajosRapidos, SenalDestacada, ListaPrioridades],
   templateUrl: './dashboard.html',
+  styleUrl: './dashboard.css',
 })
-export class Dashboard {
-  vistaActiva: VistaJornada = 'ventas';
-
-  cambiarVista(vista: VistaJornada) {
-    this.vistaActiva = vista;
-  }
-}
+export class Dashboard { } 

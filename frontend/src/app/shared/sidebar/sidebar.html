@@ -10,11 +10,14 @@
   </div>
 
   <nav class="menu" aria-label="Navegación principal">
-    @for (opcion of opciones; track opcion.ruta; let posicion = $index) {
+    @for (opcion of opciones; track opcion.ruta) {
     <a [routerLink]="opcion.ruta"
        routerLinkActive="active"
-       [routerLinkActiveOptions]="{ exact: opcion.ruta === '/' }">
-      <i>{{ numero(posicion) }}</i><span>{{ opcion.nombre }}</span>
+       [routerLinkActiveOptions]="{ exact: opcion.ruta === '/' }"
+       [attr.aria-label]="opcion.nombre"
+       [attr.title]="opcion.nombre">
+      <b class="inicial">{{ opcion.nombre.charAt(0) }}</b>
+      <span>{{ opcion.nombre }}</span>
     </a>
     }
   </nav>
@@ -26,4 +29,4 @@
       <span>Granero Costalito</span>
     </div>
   </div>
-</aside>
+</aside> 

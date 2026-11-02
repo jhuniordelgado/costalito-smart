@@ -1,0 +1,19 @@
+<section class="cierre">
+  <div>
+    <p class="nota">Antes de cerrar caja</p>
+    <h3>Tres asuntos, una jornada más tranquila.</h3>
+  </div>
+
+  <ul class="lista">
+    @for (prioridad of prioridades; track prioridad.titulo) {
+    <li>
+      <span class="casilla" aria-hidden="true"></span>
+      <div>
+        <strong>{{ prioridad.titulo }}</strong>
+        <p>{{ prioridad.detalle }}</p>
+      </div>
+      <a [routerLink]="prioridad.ruta">{{ prioridad.enlace }}</a>
+    </li>
+    }
+  </ul>
+</section> 

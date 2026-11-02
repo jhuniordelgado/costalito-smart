@@ -25,8 +25,4 @@ export class Sidebar {
     { ruta: '/inteligencia', nombre: 'Señales del negocio' },
     { ruta: '/administracion', nombre: 'Ajustes' },
   ];
-
-  numero(posicion: number): string {
-    return String(posicion + 1).padStart(2, '0');
-  }
-}
+} 

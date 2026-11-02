@@ -1,0 +1,117 @@
+:host {
+  display: block;
+}
+
+.jornada {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 26px;
+  align-items: center;
+  padding-bottom: 34px;
+}
+
+.calendario {
+  display: grid;
+  justify-items: center;
+  width: 92px;
+  padding-bottom: 8px;
+  overflow: hidden;
+  background: var(--papel);
+  border: 1px solid var(--trazo);
+  border-radius: 4px;
+  box-shadow: 0 10px 16px -10px rgba(24, 35, 30, 0.55);
+  transform: rotate(-2deg);
+}
+
+.calendario-dia-semana {
+  width: 100%;
+  padding: 4px 0;
+  color: #fff;
+  background: var(--arcilla);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.calendario strong {
+  font-family: var(--letra-titulo);
+  font-size: 46px;
+  line-height: 1.1;
+}
+
+.calendario-mes {
+  font-family: var(--letra-mano);
+  font-size: 17px;
+  text-transform: capitalize;
+}
+
+.nota {
+  margin: 0 0 6px;
+  color: var(--arcilla);
+  font-family: var(--letra-mano);
+  font-size: 19px;
+}
+
+.saludo h2 {
+  margin: 0;
+  font-family: var(--letra-titulo);
+  font-size: clamp(30px, 3.2vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.estado {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.sello-abierto {
+  padding: 6px 12px;
+  color: var(--verde-monte);
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(3deg);
+}
+
+.pendientes {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  color: #fff;
+  background: var(--arcilla);
+  border-radius: 50%;
+  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+  font-family: var(--letra-mano);
+  font-size: 22px;
+  transition: transform 0.2s ease;
+}
+
+  .pendientes:hover {
+    transform: scale(1.1) rotate(-6deg);
+  }
+
+@media (max-width: 650px) {
+  .jornada {
+    grid-template-columns: 1fr auto;
+    gap: 18px;
+  }
+
+  .calendario {
+    display: none;
+  }
+
+  .estado {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+}

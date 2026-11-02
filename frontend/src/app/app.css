@@ -1,0 +1,45 @@
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  position: relative;
+  width: 100%;
+  max-width: 1560px;
+  padding: 40px clamp(24px, 4vw, 58px) 64px clamp(40px, 5vw, 76px);
+}
+
+  .main-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 26px;
+    width: 2px;
+    background: var(--margen);
+  }
+
+@media (max-width: 1050px) {
+  .main-content {
+    padding: 35px 32px 48px 48px;
+  }
+
+    .main-content::before {
+      left: 20px;
+    }
+}
+
+@media (max-width: 650px) {
+  .app-shell {
+    display: block;
+  }
+
+  .main-content {
+    padding: 28px 20px 38px 34px;
+  }
+
+    .main-content::before {
+      left: 14px;
+    }
+}

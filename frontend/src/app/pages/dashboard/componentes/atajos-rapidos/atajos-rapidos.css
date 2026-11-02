@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.atajos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 34px 0 70px;
+}
+
+.ficha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px 16px 26px;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 1px solid var(--trazo);
+  border-left: 6px dashed var(--mostaza);
+  box-shadow: 0 8px 14px -12px rgba(24, 35, 30, 0.6);
+  text-decoration: none;
+  font-family: var(--letra-mano);
+  font-size: 21px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+  .ficha:nth-child(odd) {
+    transform: rotate(-0.7deg);
+  }
+
+  .ficha:nth-child(even) {
+    transform: rotate(0.6deg);
+  }
+
+  .ficha:hover {
+    background: #fff8e0;
+    transform: rotate(0) translateY(-3px);
+  }
+
+  .ficha b {
+    color: var(--arcilla);
+    font-size: 24px;
+  }
+
+@media (max-width: 650px) {
+  .atajos {
+    grid-template-columns: 1fr;
+    margin-bottom: 55px;
+  }
+}

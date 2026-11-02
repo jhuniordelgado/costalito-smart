@@ -1,0 +1,8 @@
+<section class="atajos" aria-label="Acciones frecuentes">
+  @for (atajo of atajos; track atajo.ruta) {
+  <a class="ficha" [routerLink]="atajo.ruta">
+    <span>{{ atajo.texto }}</span>
+    <b>→</b>
+  </a>
+  }
+</section> 

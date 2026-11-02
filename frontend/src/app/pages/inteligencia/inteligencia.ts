@@ -7,4 +7,4 @@ import { RouterLink } from '@angular/router';
   styleUrl: './inteligencia.css',
   templateUrl: './inteligencia.html',
 })
-export class Inteligencia {}
+export class Inteligencia { }

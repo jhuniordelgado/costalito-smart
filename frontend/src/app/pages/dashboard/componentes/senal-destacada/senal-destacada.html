@@ -1,0 +1,70 @@
+<section class="senales">
+  <div class="senales-texto">
+    <p class="nota">Decide dónde mirar primero</p>
+    <h3>El negocio te está hablando.</h3>
+    <p>Selecciona una señal y actúa sin perder el hilo de tu jornada.</p>
+  </div>
+
+  <div>
+    <div class="pestanas" role="tablist" aria-label="Señales de la jornada">
+      <button id="ventas-tab" type="button"
+              [class.activa]="vistaActiva === 'ventas'"
+              (click)="cambiarVista('ventas')"
+              role="tab"
+              aria-controls="signal-panel"
+              [attr.aria-selected]="vistaActiva === 'ventas'">
+        Ventas
+      </button>
+
+      <button id="inventario-tab" type="button"
+              [class.activa]="vistaActiva === 'inventario'"
+              (click)="cambiarVista('inventario')"
+              role="tab"
+              aria-controls="signal-panel"
+              [attr.aria-selected]="vistaActiva === 'inventario'">
+        Existencias
+      </button>
+
+      <button id="fiados-tab" type="button"
+              [class.activa]="vistaActiva === 'fiados'"
+              (click)="cambiarVista('fiados')"
+              role="tab"
+              aria-controls="signal-panel"
+              [attr.aria-selected]="vistaActiva === 'fiados'">
+        Fiados
+      </button>
+    </div>
+
+    <article id="signal-panel" class="hoja" role="tabpanel"
+             [attr.aria-labelledby]="vistaActiva + '-tab'"
+             [class.inventario]="vistaActiva === 'inventario'"
+             [class.fiados]="vistaActiva === 'fiados'">
+
+      @if (vistaActiva === 'ventas') {
+      <p class="cifra">+8%</p>
+      <div>
+        <span class="rotulo">Ventas con impulso</span>
+        <h4>Vas mejor que ayer a esta misma hora.</h4>
+        <p>El ticket promedio llegó a $17.100. Mantén a la mano arroz, aceite y huevos.</p>
+        <a routerLink="/ventas">Abrir detalle de ventas →</a>
+      </div>
+      } @else if (vistaActiva === 'inventario') {
+      <p class="cifra">08</p>
+      <div>
+        <span class="rotulo">Unidades de leche entera</span>
+        <h4>Este producto ya necesita reposición.</h4>
+        <p>También conviene revisar huevos y productos de aseo antes del siguiente pedido.</p>
+        <a routerLink="/inventario">Abrir inventario →</a>
+      </div>
+      } @else {
+      <p class="cifra">03</p>
+      <div>
+        <span class="rotulo">Saldos para conversar</span>
+        <h4>Hay fiados que merecen seguimiento.</h4>
+        <p>María Gómez supera el límite definido y tiene un saldo pendiente alto.</p>
+        <a routerLink="/creditos">Abrir fiados y pagos →</a>
+      </div>
+      }
+    </article>
+  </div>
+</section> 
