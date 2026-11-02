@@ -1,0 +1,76 @@
+<aside class="cuenta panel" aria-labelledby="titulo-cuenta">
+  <header class="cuenta-cabecera">
+    <div>
+      <p class="eyebrow">Cuenta en curso</p>
+      <h3 id="titulo-cuenta">Lo que lleva</h3>
+    </div>
+    @if (cuenta.cuenta().length > 0) {
+      <button type="button" class="limpiar" (click)="cuenta.vaciar()">Vaciar</button>
+    }
+  </header>
+
+  @if (cuenta.cuenta().length > 0) {
+    <ul class="lineas">
+      @for (linea of cuenta.cuenta(); track linea.productoId) {
+        <li>
+          <div>
+            <strong>{{ linea.nombre }}</strong>
+            <span>{{ pesos(linea.precio) }} c/u</span>
+          </div>
+          <div class="cantidad">
+            <button type="button" (click)="cuenta.cambiarCantidad(linea.productoId, -1)" [attr.aria-label]="'Quitar una unidad de ' + linea.nombre">−</button>
+            <b>{{ linea.cantidad }}</b>
+            <button type="button" (click)="cuenta.cambiarCantidad(linea.productoId, 1)" [attr.aria-label]="'Agregar una unidad de ' + linea.nombre">+</button>
+          </div>
+          <strong class="subtotal">{{ pesos(linea.cantidad * linea.precio) }}</strong>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="cuenta-vacia">
+      <span aria-hidden="true">+</span>
+      <p>Elige productos del estante para armar una venta.</p>
+    </div>
+  }
+
+  <div class="total">
+    <span>{{ cuenta.unidades() }} unidades</span>
+    <strong>{{ pesos(cuenta.total()) }}</strong>
+  </div>
+
+  <fieldset class="medios">
+    <legend>Medio de pago</legend>
+    @for (medio of medios; track medio) {
+      <button type="button" [class.activo]="cuenta.pago() === medio" (click)="seleccionarPago(medio)">{{ medio }}</button>
+    }
+  </fieldset>
+
+  @if (cuenta.pago() === 'Efectivo') {
+    <label class="campo-cuenta">
+      <span>Recibido</span>
+      <input type="number" min="0" inputmode="numeric" placeholder="Ej. 50000" (input)="cambiarRecibido($event)">
+    </label>
+    @if (cuenta.devueltaValida() !== null) {
+      <p class="devuelta">Devuelta: <strong>{{ pesos(cuenta.devueltaValida()!) }}</strong></p>
+    }
+  }
+
+  @if (cuenta.pago() === 'Fiado') {
+    <label class="campo-cuenta">
+      <span>Cliente al que se le fía</span>
+      <select (change)="cambiarCliente($event)">
+        <option value="">Selecciona un cliente</option>
+        @for (cliente of datos.clientes(); track cliente.id) {
+          <option [value]="cliente.id">{{ cliente.nombre }} · saldo {{ pesos(datos.saldoDe(cliente.id)) }}</option>
+        }
+      </select>
+    </label>
+  }
+
+  @if (cuenta.pendiente(); as mensaje) {
+    <p class="pendiente">{{ mensaje }}</p>
+  }
+  <button type="button" class="cobrar" [disabled]="cuenta.pendiente() !== null || cuenta.enviando()" (click)="cuenta.cobrar()">
+    {{ cuenta.enviando() ? 'Guardando venta…' : 'Cobrar ' + pesos(cuenta.total()) }}
+  </button>
+</aside>

@@ -1,3 +1,4 @@
+/* Menú a la izquierda y contenido a la derecha */
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -5,11 +6,19 @@
 
 .main-content {
   position: relative;
-  width: 100%;
+  flex: 1;
+  /* sin este min-width, las tablas anchas empujan todo y se sale la pantalla */
+  min-width: 0;
   max-width: 1560px;
-  padding: 40px clamp(24px, 4vw, 58px) 64px clamp(40px, 5vw, 76px);
+  /* el padding izquierdo es más grande porque ahí va el margen rojo del cuaderno */
+  padding: 40px clamp(24px, 4vw, 58px) 72px clamp(40px, 5vw, 76px);
 }
 
+  .main-content:focus {
+    outline: 0;
+  }
+
+  /* La rayita roja vertical, como el margen de una hoja de cuaderno */
   .main-content::before {
     content: "";
     position: absolute;
@@ -20,9 +29,10 @@
     background: var(--margen);
   }
 
+/* Tablet: el menú se encoge a solo íconos, así que el contenido necesita menos aire */
 @media (max-width: 1050px) {
   .main-content {
-    padding: 35px 32px 48px 48px;
+    padding: 35px 32px 56px 48px;
   }
 
     .main-content::before {
@@ -30,13 +40,14 @@
     }
 }
 
+/* Celular: el menú pasa arriba y todo se apila */
 @media (max-width: 650px) {
   .app-shell {
     display: block;
   }
 
   .main-content {
-    padding: 28px 20px 38px 34px;
+    padding: 26px 18px 48px 32px;
   }
 
     .main-content::before {

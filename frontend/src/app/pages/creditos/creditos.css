@@ -1,1 +1,9 @@
-/* Los estilos compartidos del módulo se encuentran en src/styles.css. */
+.registro-abono { display: grid; grid-template-columns: minmax(210px, 0.7fr) minmax(0, 1.3fr); gap: 22px; margin-bottom: 24px; }
+.registro-abono h3 { margin: 4px 0 0; font-size: 1.55rem; }
+.registro-abono form { display: grid; grid-template-columns: 1.5fr 1fr auto; gap: 12px; align-items: end; }
+.registro-abono label { display: grid; gap: 5px; font-size: 0.82rem; font-weight: 700; }
+.registro-abono input,.registro-abono select { min-height: 40px; padding: 7px 9px; background: #fffef9; border: 1px solid #bdb39f; }
+.registro-abono input:focus,.registro-abono select:focus { outline: 2px solid var(--mostaza); outline-offset: 2px; border-color: var(--verde-monte); }
+.registro-abono .primary-button { min-height: 40px; white-space: nowrap; }
+@media (max-width: 900px) { .registro-abono { grid-template-columns: 1fr; }.registro-abono form { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .registro-abono form { grid-template-columns: 1fr; } }

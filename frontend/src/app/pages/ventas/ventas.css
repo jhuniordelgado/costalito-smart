@@ -1,0 +1,10 @@
+.ventas-operacion {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(310px, 0.72fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 950px) {
+  .ventas-operacion { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,43 @@
+<section class="estante panel" aria-labelledby="titulo-estante">
+  <header class="estante-cabecera">
+    <div>
+      <p class="eyebrow">Mostrador</p>
+      <h3 id="titulo-estante">Elige lo que se lleva</h3>
+      <p>Los productos se agregan a la cuenta al tocarlos.</p>
+    </div>
+    <span class="contador">{{ productosFiltrados().length }} productos</span>
+  </header>
+
+  <div class="estante-filtros">
+    <label class="busqueda">
+      <span class="sr-only">Buscar producto</span>
+      <input type="search" placeholder="Buscar en el estante" (input)="buscar($event)">
+    </label>
+    <div class="categorias" aria-label="Filtrar por categoría">
+      @for (opcion of categorias(); track opcion) {
+        <button type="button" [class.activa]="categoria() === opcion" (click)="categoria.set(opcion)">
+          {{ opcion }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="productos">
+    @for (producto of productosFiltrados(); track producto.id) {
+      <button type="button" class="producto" [disabled]="producto.existencias === 0" (click)="cuenta.agregar(producto)">
+        <span class="producto-categoria">{{ producto.categoria }}</span>
+        <strong>{{ producto.nombre }}</strong>
+        <span class="producto-precio">{{ pesos(producto.precio) }}</span>
+        <span class="producto-pie">
+          {{ producto.existencias }} {{ producto.unidad }}
+          <i [class]="estadoStock(producto)">{{ estadoStock(producto) }}</i>
+        </span>
+        @if (cuenta.cantidadDe(producto.id) > 0) {
+          <b class="en-cuenta">{{ cuenta.cantidadDe(producto.id) }}</b>
+        }
+      </button>
+    } @empty {
+      <p class="vacio">No encontramos un producto con esa búsqueda.</p>
+    }
+  </div>
+</section>

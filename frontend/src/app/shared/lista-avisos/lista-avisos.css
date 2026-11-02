@@ -1,0 +1,42 @@
+.lista-avisos {
+  position: fixed;
+  z-index: 20;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  gap: 10px;
+  width: min(380px, calc(100vw - 32px));
+}
+
+.aviso {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--moss);
+  background: var(--paper);
+  box-shadow: 0 12px 28px rgba(23, 49, 40, 0.16);
+}
+
+.aviso.exito { border-left-color: var(--color-exito); }
+.aviso.informacion { border-left-color: var(--sun); }
+.aviso.error { border-left-color: var(--color-error); }
+
+.aviso strong { display: block; color: var(--ink); }
+.aviso p { margin: 4px 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
+
+.aviso button {
+  align-self: start;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.aviso button:hover,
+.aviso button:focus-visible { color: var(--ink); }

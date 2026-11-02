@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { DatosGranero } from '../../core/datos-granero';
 import { EncabezadoJornada } from './componentes/encabezado-jornada/encabezado-jornada';
 import { CorteDelDia } from './componentes/corte-del-dia/corte-del-dia';
 import { AtajosRapidos } from './componentes/atajos-rapidos/atajos-rapidos';
@@ -11,4 +12,6 @@ import { ListaPrioridades } from './componentes/lista-prioridades/lista-priorida
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard { } 
+export class Dashboard {
+  readonly datos = inject(DatosGranero);
+}

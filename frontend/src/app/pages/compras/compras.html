@@ -4,40 +4,42 @@
     <h2>Compras</h2>
     <p>Consulta las compras registradas para abastecer el granero.</p>
   </div>
-  <button class="primary-button" type="button">+ Registrar compra</button>
+  <button class="primary-button" type="button">Registrar compra</button>
 </header>
 
 <section class="metrics">
   <article class="metric-card">
-    <span class="metric-icon blue">🧾</span>
-    <div><p>Compras del mes</p><strong>$ 2.760.000</strong><small class="warning">Datos de prueba</small></div>
+    <span class="metric-icon blue" aria-hidden="true">$</span>
+    <div><p>Compras registradas</p><strong>{{ pesos(totalCompras()) }}</strong><small class="warning">Corte del mes</small></div>
   </article>
   <article class="metric-card">
-    <span class="metric-icon green">🚚</span>
-    <div><p>Proveedores activos</p><strong>12</strong><small class="positive">Disponibles para abastecimiento</small></div>
+    <span class="metric-icon green" aria-hidden="true">#</span>
+    <div><p>Proveedores activos</p><strong>{{ datos.proveedores().length }}</strong><small class="positive">Disponibles para abastecimiento</small></div>
   </article>
   <article class="metric-card">
-    <span class="metric-icon orange">📦</span>
-    <div><p>Productos recibidos</p><strong>186</strong><small class="warning">Unidades registradas este mes</small></div>
+    <span class="metric-icon orange" aria-hidden="true">+</span>
+    <div><p>Productos recibidos</p><strong>{{ productosRecibidos() }}</strong><small class="warning">Unidades registradas</small></div>
   </article>
 </section>
 
 <section class="module-card" style="margin-top: 24px;">
   <div class="toolbar">
-    <input type="search" placeholder="Buscar por proveedor o número de compra..." />
-    <select aria-label="Filtrar compras">
-      <option>Compras del mes</option>
-      <option>Esta semana</option>
-      <option>Compras pendientes</option>
+    <label class="sr-only" for="buscar-compra">Buscar compra</label>
+    <input id="buscar-compra" type="search" placeholder="Buscar proveedor o número de compra" (input)="buscar($event)">
+    <select aria-label="Filtrar compras" (change)="cambiarFiltro($event)">
+      <option value="Todas">Todas las compras</option>
+      <option value="Recibida">Recibidas</option>
+      <option value="En camino">En camino</option>
+      <option value="Pendiente de pago">Pendientes de pago</option>
     </select>
   </div>
   <div class="table-wrapper">
     <table class="data-table">
       <thead><tr><th>Compra</th><th>Proveedor</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
       <tbody>
-        <tr><td><strong>#C-204</strong></td><td>Distribuciones La 14</td><td>17 oct. 2026</td><td>$ 840.000</td><td><span class="badge success">Recibida</span></td></tr>
-        <tr><td><strong>#C-203</strong></td><td>Lácteos del Valle</td><td>15 oct. 2026</td><td>$ 426.500</td><td><span class="badge success">Recibida</span></td></tr>
-        <tr><td><strong>#C-202</strong></td><td>Aseo Total</td><td>12 oct. 2026</td><td>$ 318.000</td><td><span class="badge warning-badge">Pendiente de pago</span></td></tr>
+        @for (compra of comprasFiltradas(); track compra.id) {
+          <tr><td><strong>{{ compra.codigo }}</strong></td><td>{{ proveedor(compra.proveedorId) }}</td><td>{{ fecha(compra.fecha) }}</td><td>{{ pesos(compra.total) }}</td><td><span class="badge" [class.success]="compra.estado === 'Recibida'" [class.warning-badge]="compra.estado === 'En camino'" [class.danger]="compra.estado === 'Pendiente de pago'">{{ compra.estado }}</span></td></tr>
+        } @empty { <tr><td colspan="5" class="vacio">No hay compras con ese filtro.</td></tr> }
       </tbody>
     </table>
   </div>

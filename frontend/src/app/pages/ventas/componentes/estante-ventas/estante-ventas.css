@@ -1,0 +1,24 @@
+.estante { min-width: 0; }
+.estante-cabecera { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.estante-cabecera h3 { margin: 4px 0; font-size: clamp(1.45rem, 2.5vw, 2rem); }
+.estante-cabecera p:last-child { margin: 0; color: var(--gris-suave); }
+.contador { padding: 4px 8px; color: var(--verde-monte); background: #edf6ed; font-family: var(--fuente-ticket); font-size: 0.78rem; white-space: nowrap; }
+.estante-filtros { margin: 22px 0 18px; }
+.busqueda input { width: 100%; min-height: 42px; padding: 8px 10px; color: var(--tinta); background: #fffef9; border: 1px solid #bdb39f; }
+.busqueda input:focus { outline: 2px solid var(--mostaza); outline-offset: 2px; border-color: var(--verde-monte); }
+.categorias { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.categorias button { padding: 5px 10px; color: var(--gris-suave); background: transparent; border: 1px solid var(--trazo); border-radius: 999px; cursor: pointer; font-size: 0.84rem; }
+.categorias button:hover,
+.categorias button.activa { color: #fff; background: var(--verde-monte); border-color: var(--verde-monte); }
+.productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.producto { position: relative; display: grid; gap: 4px; min-height: 145px; padding: 14px; color: var(--tinta); background: #fffef9; border: 1px solid var(--trazo); text-align: left; cursor: pointer; transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease; }
+.producto:hover:not(:disabled) { background: #fff7d7; border-color: var(--mostaza); transform: translateY(-2px); }
+.producto:disabled { color: var(--gris-suave); cursor: not-allowed; opacity: 0.65; }
+.producto-categoria { color: var(--gris-suave); font-size: 0.72rem; line-height: 1.2; }
+.producto strong { font-size: 1rem; line-height: 1.25; }
+.producto-precio { margin-top: auto; color: var(--verde-monte); font-family: var(--fuente-ticket); font-weight: 700; }
+.producto-pie { display: flex; gap: 5px; align-items: center; justify-content: space-between; color: var(--gris-suave); font-size: 0.75rem; }
+.producto-pie i { font-style: normal; }.producto-pie i.Stock { color: var(--arcilla); }.producto-pie i.Por { color: #85600a; }
+.en-cuenta { position: absolute; top: 8px; right: 8px; display: grid; width: 24px; height: 24px; color: var(--tinta); background: var(--mostaza); border-radius: 50%; place-items: center; font-family: var(--fuente-ticket); font-size: 0.78rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 520px) { .estante-cabecera { display: block; }.contador { display: inline-block; margin-top: 12px; }.productos { grid-template-columns: repeat(2, minmax(0, 1fr)); }.producto { min-height: 150px; padding: 12px; } }

@@ -4,44 +4,53 @@
     <h2>Clientes</h2>
     <p>Administra la información de clientes y sus saldos de fiado.</p>
   </div>
-  <button class="primary-button">+ Nuevo cliente</button>
+  <button class="primary-button" type="button" (click)="formularioVisible.set(!formularioVisible())">{{ formularioVisible() ? 'Cerrar registro' : 'Nuevo cliente' }}</button>
 </header>
 
 <section class="metrics">
   <article class="metric-card">
-    <span class="metric-icon blue">👥</span>
+    <span class="metric-icon blue" aria-hidden="true">#</span>
     <div>
       <p>Clientes registrados</p>
-      <strong>74</strong>
-      <small class="positive">2 nuevos este mes</small>
+      <strong>{{ datos.clientes().length }}</strong>
+      <small class="positive">Disponibles en el granero</small>
     </div>
   </article>
   <article class="metric-card">
-    <span class="metric-icon orange">📒</span>
+    <span class="metric-icon orange" aria-hidden="true">$</span>
     <div>
       <p>Fiados activos</p>
-      <strong>9</strong>
+      <strong>{{ datos.clientesConSaldo().length }}</strong>
       <small class="warning">Requieren seguimiento</small>
     </div>
   </article>
   <article class="metric-card">
-    <span class="metric-icon red">⚠️</span>
+    <span class="metric-icon red" aria-hidden="true">!</span>
     <div>
       <p>Saldo pendiente</p>
-      <strong>$ 214.800</strong>
-      <small class="warning">Datos de prueba</small>
+      <strong>{{ pesos(datos.totalPorCobrar()) }}</strong>
+      <small class="warning">Total por cobrar</small>
     </div>
   </article>
 </section>
 
+@if (formularioVisible()) {
+  <section class="registro-cliente panel" aria-labelledby="titulo-nuevo-cliente">
+    <div><p class="eyebrow">Nuevo registro</p><h3 id="titulo-nuevo-cliente">Agrega un cliente al granero</h3></div>
+    <form (submit)="guardar($event)">
+      <label>Nombre completo <input name="nombre" required autocomplete="name"></label>
+      <label>Teléfono <input name="telefono" required inputmode="tel" autocomplete="tel"></label>
+      <label>Límite de fiado <input name="limite" required type="number" min="1" inputmode="numeric" placeholder="Ej. 120000"></label>
+      <button class="primary-button" type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar cliente' }}</button>
+    </form>
+  </section>
+}
+
 <section class="module-card" style="margin-top: 24px;">
   <div class="toolbar">
-    <input type="search" placeholder="Buscar cliente..." />
-    <select>
-      <option>Todos los clientes</option>
-      <option>Con fiado activo</option>
-      <option>Con saldo vencido</option>
-    </select>
+    <label class="sr-only" for="buscar-cliente">Buscar cliente</label>
+    <input id="buscar-cliente" type="search" placeholder="Buscar cliente" (input)="buscar($event)">
+    <button class="filtro-saldo" type="button" [class.activo]="soloConSaldo()" (click)="soloConSaldo.set(!soloConSaldo())">{{ soloConSaldo() ? 'Mostrando fiados' : 'Ver solo fiados' }}</button>
   </div>
 
   <div class="table-wrapper">
@@ -55,10 +64,20 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td><strong>María Gómez</strong></td><td>300 555 1020</td><td>$ 48.200</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
-        <tr><td><strong>Carlos Rojas</strong></td><td>310 204 5780</td><td>$ 36.000</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
-        <tr><td><strong>Laura Martínez</strong></td><td>315 881 2290</td><td>$ 0</td><td><span class="badge success">Al día</span></td></tr>
-        <tr><td><strong>Andrés Torres</strong></td><td>320 490 1643</td><td>$ 25.000</td><td><span class="badge warning-badge">Pendiente</span></td></tr>
+        @for (cliente of clientesFiltrados(); track cliente.id) {
+          <tr>
+            <td><strong>{{ cliente.nombre }}</strong></td>
+            <td>{{ cliente.telefono }}</td>
+            <td>{{ pesos(datos.saldoDe(cliente.id)) }}</td>
+            <td>
+              @if (datos.saldoDe(cliente.id) > cliente.limite) { <span class="badge danger">Superó límite</span> }
+              @else if (datos.saldoDe(cliente.id) > 0) { <span class="badge warning-badge">Pendiente</span> }
+              @else { <span class="badge success">Al día</span> }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4" class="vacio">No hay clientes con ese filtro.</td></tr>
+        }
       </tbody>
     </table>
   </div>

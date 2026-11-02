@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatosGranero } from '../../core/datos-granero';
 
 @Component({
   imports: [RouterLink],
@@ -7,4 +8,6 @@ import { RouterLink } from '@angular/router';
   styleUrl: './inteligencia.css',
   templateUrl: './inteligencia.html',
 })
-export class Inteligencia { }
+export class Inteligencia {
+  readonly datos = inject(DatosGranero);
+}

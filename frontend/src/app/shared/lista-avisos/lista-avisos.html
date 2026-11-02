@@ -1,0 +1,11 @@
+<section class="lista-avisos" aria-live="polite" aria-label="Mensajes del sistema">
+  @for (aviso of avisos.lista(); track aviso.id) {
+    <article class="aviso" [class]="aviso.tipo">
+      <div>
+        <strong>{{ aviso.titulo }}</strong>
+        <p>{{ aviso.detalle }}</p>
+      </div>
+      <button type="button" (click)="avisos.cerrar(aviso.id)" [attr.aria-label]="'Cerrar: ' + aviso.titulo">×</button>
+    </article>
+  }
+</section>

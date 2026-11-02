@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatosGranero } from '../../../../core/datos-granero';
+import { pesos } from '../../../../core/formato';
 
 @Component({
   selector: 'app-corte-del-dia',
@@ -8,9 +10,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './corte-del-dia.css',
 })
 export class CorteDelDia {
-  totalVendido = '$632.700';
-  cantidadVentas = 37;
-  diferenciaAyer = '$46.900';
-  alturasBarras = [24, 48, 35, 74, 94, 57, 39];
-  horasEje = ['8 a. m.', '12 m.', '4 p. m.'];
+  readonly datos = inject(DatosGranero);
+  readonly pesos = pesos;
+  hora(hora: number): string { return new Intl.DateTimeFormat('es-CO', { hour: 'numeric' }).format(new Date(2026, 0, 1, hora)); }
 } 

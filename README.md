@@ -20,14 +20,16 @@ El prototipo incluye:
 - Reportes y módulo visual de alertas y análisis.
 - Administración de usuarios, roles y parámetros iniciales.
 - Formularios, filtros, tablas, tarjetas y datos de prueba coherentes con un granero pequeño.
+- Registro de ventas, clientes y abonos con actualización visual entre módulos durante la sesión.
 
-La aplicación presenta datos de prueba y no guarda información. En esta etapa no se implementan base de datos, backend, autenticación ni análisis predictivo automático. Estas capacidades se contemplan para fases posteriores.
+La aplicación presenta datos de prueba en memoria: permite simular registros y actualiza las vistas relacionadas mientras está abierta. No implementa base de datos, backend, autenticación ni análisis predictivo automático; estas capacidades se contemplan para fases posteriores.
 
 ## Organización del frontend
 
 La estructura principal del frontend es:
 
 - `pages/`: pantallas organizadas por módulo funcional.
+- `core/`: modelos del dominio, datos de prueba, formato, avisos y estado compartido de la venta en curso.
 - `shared/sidebar/`: menú lateral reutilizable y visible en toda la aplicación.
 - `app.routes.ts`: definición de rutas y navegación.
 - `app.ts`: componente raíz de la aplicación.
@@ -43,7 +45,14 @@ El recurso de marca se encuentra en `frontend/public/brand/costalito-logo.jpg`. 
 
 ## Preparación para la integración
 
-Actualmente el frontend usa datos de prueba para demostrar navegación y presentación. Está preparado para que el backend reemplace esos datos mediante servicios Angular, manteniendo las rutas y componentes visuales actuales.
+Actualmente el frontend usa datos de prueba para demostrar navegación, validaciones y operaciones básicas. `core/datos-granero.ts` concentra los datos y métodos que el backend reemplazará por llamadas HTTP, sin obligar a reescribir las pantallas.
+
+### Entrega para backend
+
+- `core/modelos.ts` define las entidades que ya espera la interfaz: productos, clientes, proveedores, ventas, compras y abonos.
+- `core/datos-granero.ts` concentra las consultas y operaciones del prototipo (`registrarVenta`, `registrarAbono`, `registrarCliente`, entre otras). El backend puede conservar esta interfaz y sustituir internamente los datos en memoria por peticiones HTTP.
+- `core/avisos.ts` muestra los estados de éxito, error e información. Las pantallas no deben borrar formularios cuando una petición falle.
+- Los datos actuales viven solo durante la sesión. La API será la fuente de verdad cuando existan base de datos, autenticación y reglas finales.
 
 - `frontend/`: aplicación Angular, páginas y componentes compartidos.
 - `backend/`: carpeta reservada para la lógica de negocio y API REST.

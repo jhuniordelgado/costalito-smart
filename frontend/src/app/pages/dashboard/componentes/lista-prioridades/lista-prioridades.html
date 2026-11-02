@@ -5,7 +5,7 @@
   </div>
 
   <ul class="lista">
-    @for (prioridad of prioridades; track prioridad.titulo) {
+    @for (prioridad of prioridades(); track prioridad.clave) {
     <li>
       <span class="casilla" aria-hidden="true"></span>
       <div>

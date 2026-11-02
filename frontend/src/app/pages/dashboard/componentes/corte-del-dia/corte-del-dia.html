@@ -1,22 +1,22 @@
 <section class="corte" aria-label="Resumen de la jornada">
   <article class="tirilla">
     <div class="tirilla-titulo">Costalito · corte parcial</div>
-    <div class="tirilla-linea"><span>Ventas</span><span>{{ cantidadVentas }}</span></div>
-    <div class="tirilla-linea"><span>Frente a ayer</span><span>↑ {{ diferenciaAyer }}</span></div>
-    <div class="tirilla-total"><span>TOTAL</span><strong>{{ totalVendido }}</strong></div>
+    <div class="tirilla-linea"><span>Ventas</span><span>{{ datos.cantidadHoy() }}</span></div>
+    <div class="tirilla-linea"><span>Frente a ayer</span><span>↑ {{ pesos(datos.diferenciaAyer()) }}</span></div>
+    <div class="tirilla-total"><span>TOTAL</span><strong>{{ pesos(datos.totalHoy()) }}</strong></div>
     <div class="tirilla-gracias">Gracias por su compra</div>
   </article>
 
   <div class="grafica" aria-label="Ritmo de ventas de hoy">
     <p class="grafica-titulo">Ritmo de la jornada</p>
     <div class="barras">
-      @for (altura of alturasBarras; track $index) {
-      <span [style.height.%]="altura"></span>
+      @for (bloque of datos.ritmo(); track bloque.hora) {
+      <span [style.height.%]="bloque.porcentaje" [attr.aria-label]="hora(bloque.hora) + ': ' + pesos(bloque.total)"></span>
       }
     </div>
     <div class="horas">
-      @for (hora of horasEje; track hora) {
-      <b>{{ hora }}</b>
+      @for (bloque of datos.ritmo(); track bloque.hora) {
+      <b>{{ hora(bloque.hora) }}</b>
       }
     </div>
   </div>

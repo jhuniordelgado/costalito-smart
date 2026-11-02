@@ -1,7 +1,14 @@
-<div class="app-shell">
-  <app-sidebar></app-sidebar>
+<!-- Este enlace no se ve; aparece al darle Tab y sirve para brincarse el menú -->
+<a class="saltar" href="#contenido">Saltar al contenido</a>
 
-  <main class="main-content">
-    <router-outlet></router-outlet>
+<div class="app-shell">
+  <app-sidebar />
+
+  <!-- Aquí se pinta la página: Mi jornada, Ventas, Inventario... según la ruta -->
+  <main class="main-content" id="contenido" tabindex="-1">
+    <router-outlet />
   </main>
 </div>
+
+<!-- Los papelitos de "venta registrada", "error", etc. -->
+<app-lista-avisos />

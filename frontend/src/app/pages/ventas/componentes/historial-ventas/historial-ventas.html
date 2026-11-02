@@ -1,0 +1,40 @@
+<section class="historial module-card" aria-labelledby="titulo-historial">
+  <header class="historial-cabecera">
+    <div>
+      <p class="eyebrow">Jornada de hoy</p>
+      <h3 id="titulo-historial">Ventas registradas</h3>
+    </div>
+    <span class="status">{{ datos.cantidadHoy() }} movimientos</span>
+  </header>
+
+  <div class="toolbar">
+    <label class="sr-only" for="buscar-venta">Buscar venta</label>
+    <input id="buscar-venta" type="search" placeholder="Buscar por cliente o factura" (input)="buscar($event)">
+    <label class="sr-only" for="filtro-venta">Filtrar por pago</label>
+    <select id="filtro-venta" (change)="cambiarFiltro($event)">
+      <option value="Todas">Todos los pagos</option>
+      <option value="Efectivo">Efectivo</option>
+      <option value="Nequi">Nequi</option>
+      <option value="Fiado">Fiado</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead><tr><th>Factura</th><th>Cliente</th><th>Hora</th><th>Total</th><th>Pago</th></tr></thead>
+      <tbody>
+        @for (venta of ventasFiltradas(); track venta.id) {
+          <tr [class.nueva-venta]="cuenta.ultimaVenta() === venta.id">
+            <td><strong>{{ venta.codigo }}</strong></td>
+            <td>{{ venta.cliente }}</td>
+            <td>{{ hora(venta.hora) }}</td>
+            <td class="monto">{{ pesos(venta.total) }}</td>
+            <td><span class="badge" [class.warning-badge]="venta.pago === 'Fiado'" [class.success]="venta.pago !== 'Fiado'">{{ venta.pago }}</span></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="sin-resultados">No hay ventas que coincidan con el filtro.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

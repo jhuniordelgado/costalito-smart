@@ -2,20 +2,26 @@
   <div>
     <p class="eyebrow">Gestión operativa</p>
     <h2>Inventario</h2>
-    <p>Consulta y administra los productos disponibles en el granero.</p>
+    <p>Consulta existencias y detecta a tiempo lo que necesita reposición.</p>
   </div>
-
-  <button class="primary-button">+ Agregar producto</button>
+  <button class="primary-button" type="button">Agregar producto</button>
 </header>
+
+<section class="metrics">
+  <article class="metric-card"><span class="metric-icon green" aria-hidden="true">#</span><div><p>Productos activos</p><strong>{{ datos.productos().length }}</strong><small class="positive">Disponibles en el estante</small></div></article>
+  <article class="metric-card"><span class="metric-icon red" aria-hidden="true">!</span><div><p>Por reponer</p><strong>{{ datos.productosBajos().length }}</strong><small class="warning">Requieren una revisión</small></div></article>
+  <article class="metric-card"><span class="metric-icon orange" aria-hidden="true">$</span><div><p>Valor estimado</p><strong>{{ pesos(valorInventario()) }}</strong><small class="warning">Costo mostrado a precio de venta</small></div></article>
+</section>
 
 <section class="module-card">
   <div class="toolbar">
-    <input type="search" placeholder="Buscar producto..." />
-    <select>
-      <option>Todas las categorías</option>
-      <option>Granos y abarrotes</option>
-      <option>Bebidas</option>
-      <option>Aseo</option>
+    <label class="sr-only" for="buscar-producto">Buscar producto</label>
+    <input id="buscar-producto" type="search" placeholder="Buscar producto" (input)="buscar($event)">
+    <label class="sr-only" for="categoria-producto">Filtrar categoría</label>
+    <select id="categoria-producto" (change)="categoria.set($any($event.target).value)">
+      @for (opcion of categorias(); track opcion) {
+        <option [value]="opcion">{{ opcion }}</option>
+      }
     </select>
   </div>
 
@@ -31,41 +37,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>Arroz Diana 500 g</strong></td>
-          <td>Granos y abarrotes</td>
-          <td>86 unidades</td>
-          <td>$ 3.400</td>
-          <td><span class="badge success">Disponible</span></td>
-        </tr>
-        <tr>
-          <td><strong>Leche entera 1 L</strong></td>
-          <td>Lácteos</td>
-          <td>8 unidades</td>
-          <td>$ 4.800</td>
-          <td><span class="badge danger">Stock bajo</span></td>
-        </tr>
-        <tr>
-          <td><strong>Aceite vegetal 1 L</strong></td>
-          <td>Granos y abarrotes</td>
-          <td>24 unidades</td>
-          <td>$ 11.900</td>
-          <td><span class="badge warning-badge">Por revisar</span></td>
-        </tr>
-        <tr>
-          <td><strong>Huevos AA x 30</strong></td>
-          <td>Alimentos</td>
-          <td>35 cubetas</td>
-          <td>$ 21.500</td>
-          <td><span class="badge success">Disponible</span></td>
-        </tr>
-        <tr>
-          <td><strong>Jabón líquido 1 L</strong></td>
-          <td>Aseo</td>
-          <td>17 unidades</td>
-          <td>$ 10.900</td>
-          <td><span class="badge success">Disponible</span></td>
-        </tr>
+        @for (producto of productosFiltrados(); track producto.id) {
+          <tr>
+            <td><strong>{{ producto.nombre }}</strong></td>
+            <td>{{ producto.categoria }}</td>
+            <td>{{ producto.existencias }} {{ producto.unidad }}</td>
+            <td>{{ pesos(producto.precio) }}</td>
+            <td><span class="sello sello--{{ tipoSello(estadoStock(producto)) }}">{{ estadoStock(producto) }}</span></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="vacio">No hay productos para ese filtro.</td></tr>
+        }
       </tbody>
     </table>
   </div>
