@@ -35,15 +35,16 @@ export class Clientes {
     const formulario = evento.currentTarget as HTMLFormElement;
     const valores = new FormData(formulario);
     const nombre = String(valores.get('nombre') ?? '').trim();
+    const cedula = String(valores.get('cedula') ?? '').trim();
     const telefono = String(valores.get('telefono') ?? '').trim();
     const limite = Number(valores.get('limite'));
-    if (!nombre || !telefono || !Number.isFinite(limite) || limite <= 0) {
-      this.avisos.error('Revisa el formulario', 'Completa nombre, teléfono y un límite de fiado válido.');
+    if (!nombre || !cedula || !telefono || !Number.isFinite(limite) || limite <= 0) {
+      this.avisos.error('Revisa el formulario', 'Completa nombre, cédula, teléfono y un límite de fiado válido.');
       return;
     }
     this.guardando.set(true);
     try {
-      await this.datos.registrarCliente({ nombre, telefono, limite });
+      await this.datos.registrarCliente({ nombre, cedula, telefono, limite });
       formulario.reset();
       this.formularioVisible.set(false);
       this.avisos.ok('Cliente registrado', `${nombre} ya está disponible para ventas fiadas.`);

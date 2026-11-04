@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { DatosGranero } from './core/datos-granero';
 import { Sidebar } from './shared/sidebar/sidebar';
 import { ListaAvisos } from './shared/lista-avisos/lista-avisos';
 
@@ -11,4 +12,6 @@ import { ListaAvisos } from './shared/lista-avisos/lista-avisos';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App { }
+export class App {
+  readonly datos = inject(DatosGranero);
+}

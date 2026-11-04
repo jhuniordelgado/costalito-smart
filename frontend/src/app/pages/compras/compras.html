@@ -4,7 +4,7 @@
     <h2>Compras</h2>
     <p>Consulta las compras registradas para abastecer el granero.</p>
   </div>
-  <button class="primary-button" type="button">Registrar compra</button>
+  <button class="primary-button" type="button" (click)="formularioVisible.set(!formularioVisible())">{{ formularioVisible() ? 'Cerrar registro' : 'Registrar compra' }}</button>
 </header>
 
 <section class="metrics">
@@ -22,6 +22,38 @@
   </article>
 </section>
 
+@if (formularioVisible()) {
+  <section class="registro-operacion panel" aria-labelledby="titulo-nueva-compra">
+    <div><p class="eyebrow">Nuevo registro</p><h3 id="titulo-nueva-compra">Registra una compra</h3></div>
+    <form (submit)="guardarCompra($event)">
+      <label>Proveedor
+        <select name="proveedor" required>
+          <option value="">Selecciona un proveedor</option>
+          @for (proveedor of datos.proveedores(); track proveedor.id) { <option [value]="proveedor.id">{{ proveedor.nombre }}</option> }
+        </select>
+      </label>
+      <label>Producto
+        <select name="producto" required>
+          <option value="">Selecciona un producto</option>
+          @for (producto of datos.productos(); track producto.id) { <option [value]="producto.id">{{ producto.nombre }}</option> }
+        </select>
+      </label>
+      <label>Cantidad <input name="cantidad" type="number" min="0.001" step="0.001" required></label>
+      <label>Costo por unidad <input name="costoUnitario" type="number" min="0.01" step="0.01" required></label>
+      <label>Número de factura <input name="codigo" maxlength="40"></label>
+      <label>Fecha de vencimiento <input name="fechaVencimiento" type="date"></label>
+      <label>Estado
+        <select name="estado" required>
+          <option value="En camino">En camino</option>
+          <option value="Recibida">Recibida</option>
+          <option value="Pendiente de pago">Pendiente de pago</option>
+        </select>
+      </label>
+      <button class="primary-button" type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar compra' }}</button>
+    </form>
+  </section>
+}
+
 <section class="module-card" style="margin-top: 24px;">
   <div class="toolbar">
     <label class="sr-only" for="buscar-compra">Buscar compra</label>
@@ -35,11 +67,11 @@
   </div>
   <div class="table-wrapper">
     <table class="data-table">
-      <thead><tr><th>Compra</th><th>Proveedor</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
+      <thead><tr><th>Compra</th><th>Proveedor</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
       <tbody>
         @for (compra of comprasFiltradas(); track compra.id) {
-          <tr><td><strong>{{ compra.codigo }}</strong></td><td>{{ proveedor(compra.proveedorId) }}</td><td>{{ fecha(compra.fecha) }}</td><td>{{ pesos(compra.total) }}</td><td><span class="badge" [class.success]="compra.estado === 'Recibida'" [class.warning-badge]="compra.estado === 'En camino'" [class.danger]="compra.estado === 'Pendiente de pago'">{{ compra.estado }}</span></td></tr>
-        } @empty { <tr><td colspan="5" class="vacio">No hay compras con ese filtro.</td></tr> }
+          <tr><td><strong>{{ compra.codigo }}</strong></td><td>{{ proveedor(compra.proveedorId) }}</td><td>{{ fecha(compra.fecha) }}</td><td>{{ pesos(compra.total) }}</td><td><span class="badge" [class.success]="compra.estado === 'Recibida'" [class.warning-badge]="compra.estado === 'En camino'" [class.danger]="compra.estado === 'Pendiente de pago'">{{ compra.estado }}</span></td><td>@if (compra.estado === 'En camino') { <button class="text-button" type="button" (click)="marcarRecibida(compra.id)">Marcar recibida</button> } @else { — }</td></tr>
+        } @empty { <tr><td colspan="6" class="vacio">No hay compras con ese filtro.</td></tr> }
       </tbody>
     </table>
   </div>

@@ -4,8 +4,21 @@
     <h2>Proveedores</h2>
     <p>Consulta los proveedores que abastecen el granero.</p>
   </div>
-  <button class="primary-button" type="button">Nuevo proveedor</button>
+  <button class="primary-button" type="button" (click)="formularioVisible.set(!formularioVisible())">{{ formularioVisible() ? 'Cerrar registro' : 'Nuevo proveedor' }}</button>
 </header>
+
+@if (formularioVisible()) {
+  <section class="registro-operacion panel" aria-labelledby="titulo-nuevo-proveedor">
+    <div><p class="eyebrow">Nuevo registro</p><h3 id="titulo-nuevo-proveedor">Agrega un proveedor</h3></div>
+    <form (submit)="guardar($event)">
+      <label>Nombre del proveedor <input name="nombre" required autocomplete="organization"></label>
+      <label>Persona de contacto <input name="contacto" required autocomplete="name"></label>
+      <label>Teléfono <input name="telefono" required inputmode="tel" autocomplete="tel"></label>
+      <label>Productos que surte <input name="surte" required></label>
+      <button class="primary-button" type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar proveedor' }}</button>
+    </form>
+  </section>
+}
 
 <section class="module-card">
   <div class="toolbar">

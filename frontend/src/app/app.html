@@ -6,6 +6,15 @@
 
   <!-- Aquí se pinta la página: Mi jornada, Ventas, Inventario... según la ruta -->
   <main class="main-content" id="contenido" tabindex="-1">
+    @if (datos.errorConexion()) {
+      <div class="connection-warning" role="alert">
+        <span>{{ datos.errorConexion() }}</span>
+        <button type="button" (click)="datos.cargar()">Reintentar</button>
+      </div>
+    }
+    @if (datos.cargando()) {
+      <p class="connection-loading" role="status">Conectando con Costalito Smart…</p>
+    }
     <router-outlet />
   </main>
 </div>
