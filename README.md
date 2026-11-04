@@ -50,8 +50,9 @@ La conexión local predeterminada del frontend apunta a `http://localhost:5256/a
 
 1. Crear la base y sus tablas ejecutando `database/01_crear_estructura.sql` en SQL Server.
 2. Cargar los datos de demostración con `database/02_datos_prueba.sql`.
-3. Copiar `backend/Costalito.Api/appsettings.Example.json` a `backend/Costalito.Api/appsettings.Development.json` y ajustar el servidor/credenciales. El archivo de desarrollo está excluido de Git. También se puede configurar `ConnectionStrings__Costalito` como variable de entorno.
-4. Desde la raíz, iniciar la API:
+3. Ejecutar `database/03_reparar_nombres_seed.sql` después de cargar las semillas; corrige acentos si la herramienta SQL interpretó el archivo con otra codificación.
+4. Copiar `backend/Costalito.Api/appsettings.Example.json` a `backend/Costalito.Api/appsettings.Development.json` y ajustar el servidor/credenciales. El archivo de desarrollo está excluido de Git. También se puede configurar `ConnectionStrings__Costalito` como variable de entorno.
+5. Desde la raíz, iniciar la API:
 
    ```powershell
    dotnet run --project backend/Costalito.Api
@@ -59,7 +60,7 @@ La conexión local predeterminada del frontend apunta a `http://localhost:5256/a
 
    Swagger queda disponible en `http://localhost:5256/swagger`.
 
-5. En otra terminal:
+6. En otra terminal:
 
    ```powershell
    cd frontend
@@ -67,7 +68,7 @@ La conexión local predeterminada del frontend apunta a `http://localhost:5256/a
    npm start
    ```
 
-6. Abrir `http://localhost:4200`.
+7. Abrir `http://localhost:4200`.
 
 Para comprobar la compilación Angular: `cd frontend; npm run build`. Para compilar la API: `dotnet build backend/Costalito.Api/Costalito.Api.csproj`.
 

@@ -4,9 +4,10 @@ API REST en ASP.NET Core 10 con EF Core y SQL Server. La solución separa contro
 
 ## Configuración local
 
-1. Ejecuta los scripts `database/01_crear_estructura.sql` y `database/02_datos_prueba.sql` en SQL Server.
-2. Copia `Costalito.Api/appsettings.Example.json` como `Costalito.Api/appsettings.Development.json` y ajusta el servidor si hace falta. Ese archivo local está excluido de Git.
-3. Desde la raíz del repositorio, inicia la API:
+1. Ejecuta `database/01_crear_estructura.sql` y `database/02_datos_prueba.sql` en SQL Server.
+2. Ejecuta `database/03_reparar_nombres_seed.sql` para normalizar los acentos de los datos de ejemplo si la herramienta SQL alteró la codificación.
+3. Copia `Costalito.Api/appsettings.Example.json` como `Costalito.Api/appsettings.Development.json` y ajusta el servidor si hace falta. Ese archivo local está excluido de Git.
+4. Desde la raíz del repositorio, inicia la API:
 
 ```powershell
 dotnet run --project backend/Costalito.Api
