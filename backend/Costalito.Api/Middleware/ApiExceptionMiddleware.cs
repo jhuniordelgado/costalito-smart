@@ -45,9 +45,12 @@ public sealed class ApiExceptionMiddleware(
         catch (Exception error)
         {
             logger.LogError(error, "Error inesperado al procesar {Path}.", context.Request.Path);
+            var detalle = context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment()
+                ? error.ToString()
+                : null;
             await EscribirErrorAsync(
                 context, StatusCodes.Status500InternalServerError,
-                "Ocurrió un error interno. Intenta de nuevo más tarde.");
+                "Ocurrió un error interno. Intenta de nuevo más tarde.", detalle);
         }
     }
 
@@ -61,7 +64,8 @@ public sealed class ApiExceptionMiddleware(
         return false;
     }
 
-    private static async Task EscribirErrorAsync(HttpContext context, int status, string message)
+    private static async Task EscribirErrorAsync(
+        HttpContext context, int status, string message, string? detalle = null)
     {
         if (context.Response.HasStarted)
             return;
@@ -69,11 +73,15 @@ public sealed class ApiExceptionMiddleware(
         context.Response.Clear();
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/json; charset=utf-8";
-        await context.Response.WriteAsJsonAsync(new
+        var respuesta = new Dictionary<string, object?>
         {
-            error = message,
-            status,
-            traceId = context.TraceIdentifier,
-        });
+            ["error"] = message,
+            ["status"] = status,
+            ["traceId"] = context.TraceIdentifier,
+        };
+        if (detalle is not null)
+            respuesta["detalle"] = detalle;
+
+        await context.Response.WriteAsJsonAsync(respuesta);
     }
 }

@@ -88,6 +88,10 @@ public sealed class CostalitoDbContext(DbContextOptions<CostalitoDbContext> opti
             entity.ToTable("AjustesInventario");
             entity.Property(ajuste => ajuste.Cantidad).HasPrecision(12, 3);
         });
-        modelBuilder.Entity<ConfiguracionNegocio>().ToTable("ConfiguracionNegocio");
+        modelBuilder.Entity<ConfiguracionNegocio>(entity =>
+        {
+            entity.ToTable("ConfiguracionNegocio");
+            entity.HasKey(configuracion => configuracion.ConfiguracionId);
+        });
     }
 }

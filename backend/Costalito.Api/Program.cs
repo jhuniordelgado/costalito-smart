@@ -19,9 +19,21 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IGraneroRepository, GraneroRepository>();
 builder.Services.AddScoped<IGraneroService, GraneroService>();
 builder.Services.AddCors(options => options.AddPolicy("Frontend", policy =>
-    policy.WithOrigins("http://localhost:4200")
-        .AllowAnyHeader()
-        .AllowAnyMethod()));
+{
+    policy.SetIsOriginAllowed(origin =>
+    {
+        if (origin == "http://localhost:4200")
+            return true;
+
+        // Angular may choose another local port when 4200 is already busy.
+        return builder.Environment.IsDevelopment()
+            && Uri.TryCreate(origin, UriKind.Absolute, out var uri)
+            && uri.Scheme == Uri.UriSchemeHttp
+            && (uri.Host == "localhost" || uri.Host == "127.0.0.1");
+    })
+    .AllowAnyHeader()
+    .AllowAnyMethod();
+}));
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>

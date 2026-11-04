@@ -4,8 +4,8 @@ La guía solicita registrar, consultar, validar información inválida y comprob
 
 | # | Escenario | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|
-| 1 | Registrar un cliente desde Angular y consultar la fila en SQL Server. | La API responde éxito y el registro queda persistido. | Pendiente: no hay una instancia SQL Server accesible en `localhost` en este entorno. | No ejecutada |
-| 2 | Consultar `/api/bootstrap` y visualizar productos y clientes en la interfaz. | La API devuelve los registros de SQL Server y Angular los presenta. | Los scripts se ejecutaron en LocalDB: 14 productos, 5 clientes, 5 proveedores y 2 compras. La conexión HTTP a `localhost` desde este entorno de ejecución quedó bloqueada; falta verificar el endpoint desde el equipo del usuario. | Parcial |
+| 1 | Registrar un cliente desde Angular y consultar la fila en SQL Server. | La API responde éxito y el registro queda persistido. | Pendiente de ejecutar desde la interfaz. LocalDB está disponible y la API responde. | No ejecutada |
+| 2 | Consultar `/api/bootstrap` y visualizar productos y clientes en la interfaz. | La API devuelve los registros de SQL Server y Angular los presenta. | `GET /api/bootstrap` responde HTTP 200 con Granero Costalito, 14 productos, 5 clientes, 5 proveedores y 2 compras. También se confirmó `Access-Control-Allow-Origin: http://localhost:4200`. Falta confirmar visualmente la recarga del frontend. | Parcial |
 | 3 | Enviar una venta con cantidad cero o un producto inexistente. | La API rechaza la solicitud con error de validación y no cambia el inventario. | Pendiente: requiere ejecutar la API conectada a SQL Server. | No ejecutada |
 | 4 | Abrir la interfaz con la API detenida y volver a intentar la carga. | La interfaz informa que no hay conexión y permite reintentar. | Pendiente de comprobación en navegador; el cliente HTTP maneja el error de conexión y ofrece reintento. | No ejecutada |
 
