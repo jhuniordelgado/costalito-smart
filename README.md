@@ -22,7 +22,7 @@ El prototipo incluye:
 - Formularios, filtros, tablas, tarjetas y datos de prueba coherentes con un granero pequeño.
 - Registro de ventas, clientes y abonos con actualización visual entre módulos durante la sesión.
 
-La aplicación presenta datos de prueba en memoria: permite simular registros y actualiza las vistas relacionadas mientras está abierta. No implementa base de datos, backend, autenticación ni análisis predictivo automático; estas capacidades se contemplan para fases posteriores.
+La aplicación frontend presenta datos de prueba en memoria. Se agregó una API REST en Python con persistencia SQLite y reglas de negocio para ventas, inventario, compras, clientes, proveedores, abonos y datos del granero. La interfaz Angular todavía debe conectarse a esa API para dejar de usar su estado en memoria. No se implementa autenticación ni análisis predictivo automático.
 
 ## Organización del frontend
 
@@ -48,6 +48,8 @@ El recurso de marca se encuentra en `frontend/public/brand/costalito-logo.jpg`. 
 Actualmente el frontend usa datos de prueba para demostrar navegación, validaciones y operaciones básicas. `core/datos-granero.ts` concentra los datos y métodos que el backend reemplazará por llamadas HTTP, sin obligar a reescribir las pantallas.
 
 ### Entrega para backend
+
+- `backend/app.py` implementa la API REST y crea la base SQLite al iniciarse. Las instrucciones de inicio y rutas están en `backend/README.md`.
 
 - `core/modelos.ts` define las entidades que ya espera la interfaz: productos, clientes, proveedores, ventas, compras y abonos.
 - `core/datos-granero.ts` concentra las consultas y operaciones del prototipo (`registrarVenta`, `registrarAbono`, `registrarCliente`, entre otras). El backend puede conservar esta interfaz y sustituir internamente los datos en memoria por peticiones HTTP.

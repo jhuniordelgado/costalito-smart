@@ -2,3 +2,6 @@
 docs/
 package-lock.json
 node_modules/
+backend/*.sqlite3
+backend/*.sqlite3-shm
+backend/*.sqlite3-wal
