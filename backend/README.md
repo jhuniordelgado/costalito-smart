@@ -1,34 +1,32 @@
 # Backend de Costalito Smart
 
-API REST en Python 3 y SQLite, sin paquetes externos. La base de datos se crea como `backend/costalito.sqlite3` al primer inicio y conserva los cambios entre ejecuciones.
+API REST en ASP.NET Core 10 con EF Core y SQL Server. La solución separa controladores, servicios, repositorios, DTOs, entidades y acceso a datos para que cada capa tenga una responsabilidad clara.
 
-## Iniciar
+## Configuración local
 
-Desde la raíz del repositorio:
+1. Copia `Costalito.Api/appsettings.Example.json` como `Costalito.Api/appsettings.Development.json` si el archivo local no existe. La conexión de ejemplo usa LocalDB; el archivo local está excluido de Git.
+2. Inicia LocalDB:
 
 ```powershell
-python backend/app.py
+sqllocaldb start MSSQLLocalDB
 ```
 
-La API queda en `http://localhost:8000`. Variables opcionales: `PORT` y `COSTALITO_DB` (ruta alternativa para el archivo SQLite).
+3. Desde la raíz del repositorio, inicia la API:
 
-## Rutas
+```powershell
+dotnet run --project backend/Costalito.Api --launch-profile http
+```
 
-| Método | Ruta | Uso |
-|---|---|---|
-| GET | `/api/health` | Estado del servicio |
-| GET | `/api/bootstrap` | Datos iniciales de todos los módulos |
-| GET | `/api/products`, `/api/customers`, `/api/suppliers` | Catálogos |
-| GET | `/api/sales`, `/api/purchases`, `/api/payments` | Movimientos |
-| GET / PUT | `/api/settings` | Consultar y guardar datos del granero |
-| POST | `/api/products`, `/api/customers`, `/api/suppliers` | Crear registros |
-| POST | `/api/sales` | Registrar venta y descontar inventario |
-| POST | `/api/purchases` | Registrar compra; recibe inventario salvo “En camino” |
-| PATCH | `/api/purchases/{id}` | Actualizar estado de compra |
-| POST | `/api/payments` | Registrar abono a un cliente |
+Al iniciar en Development, la API vuelve a asociar los archivos de una base local desconectada si están presentes, crea las tablas que falten y carga los datos de ejemplo. El proceso es idempotente y no borra los archivos de datos. Si la terminal ya está dentro de `backend`, usa `dotnet run --project Costalito.Api --launch-profile http`. La API queda en `http://localhost:5257` y Swagger en `/swagger`. Angular puede usar otro puerto local si 4200 está ocupado; los orígenes localhost de desarrollo están habilitados en CORS.
 
-Las operaciones financieras se ejecutan en transacciones SQLite. Los errores se devuelven como JSON `{ "error": "..." }` con el código HTTP correspondiente. La API habilita CORS para `http://localhost:4200`.
+También puedes configurar la cadena sin archivo local con la variable de entorno `ConnectionStrings__Costalito`.
 
-## Límites actuales
+## Capas
 
-Esta entrega cubre persistencia y reglas de negocio del prototipo. No incorpora autenticación, autorización por roles, despliegue ni copias de seguridad; antes de exponerla fuera del equipo local se deben agregar esas capacidades y configurar CORS para el dominio real.
+- `Controllers/`: rutas HTTP y códigos de respuesta.
+- `Services/`: reglas del negocio y conversión entre DTOs y entidades.
+- `Repositories/`: consultas y escrituras con EF Core.
+- `Models/`: entidades que corresponden a las tablas.
+- `DTOs/`: contratos de entrada y salida de la API.
+- `Data/`: `DbContext` y mapeo SQL Server.
+- `Middleware/`: errores uniformes y registro de excepciones.

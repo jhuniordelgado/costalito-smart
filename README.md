@@ -1,112 +1,89 @@
 # Costalito Smart
 
-Prototipo de gestión comercial para un granero familiar.
-
-Proyecto de Arquitectura de Software — Universidad Manuela Beltrán.
+Prototipo de gestión comercial para un granero familiar — Arquitectura de Software, Universidad Manuela Beltrán.
 
 ## Descripción
 
-Costalito Smart es un prototipo de ERP para apoyar la gestión diaria de un granero familiar. Reúne en una misma interfaz la consulta de inventario, ventas, compras, clientes, proveedores, créditos, reportes y alertas operativas.
+Costalito Smart reúne módulos de inventario, ventas, compras, clientes, proveedores, créditos y reportes en una aplicación web. La Fase 4 integra la interfaz Angular con una API REST en ASP.NET Core y una base de datos SQL Server.
 
-## Avance actual
+## Levantamiento de información
 
-Se evolucionó la propuesta de la Fase 1 hacia un frontend navegable desarrollado en Angular.
+Los requisitos iniciales se recogieron del propietario del negocio mediante **52 notas de voz de WhatsApp**, grabadas el **19 de octubre de 2026 entre las 6:12 p. m. y las 7:09 p. m.**. Las notas responden a un cuestionario de 50 preguntas distribuidas en nueve temas: productos, existencias, precios, compras, proveedores y pagos, ventas, clientes y fiados, gastos y reportes, y datos de los comprobantes.
 
-El prototipo incluye:
+Las respuestas se transcribieron con Whisper y se organizaron por pregunta. El documento de levantamiento identifica los audios relacionados con cada respuesta para contrastar la transcripción con la fuente original. La carpeta prevista para conservar esos audios es `evidencias/audios`.
 
-- Dashboard con indicadores y alertas para el seguimiento diario.
-- Navegación entre los módulos del sistema.
-- Inventario, ventas, compras, clientes, proveedores, créditos y pagos.
-- Reportes y módulo visual de alertas y análisis.
-- Administración de usuarios, roles y parámetros iniciales.
-- Formularios, filtros, tablas, tarjetas y datos de prueba coherentes con un granero pequeño.
-- Registro de ventas, clientes y abonos con actualización visual entre módulos durante la sesión.
+Hallazgos principales: registrar cantidades, códigos, presentaciones, precios y vencimientos; documentar pérdidas y devoluciones; gestionar facturas de compra, proveedores, abonos y saldos; calcular ventas con varios productos; consultar los fiados por cliente; registrar gastos y consultar movimientos por período. La entrevista indicó márgenes habituales del 10 % por unidad y 5 % al por mayor. El prototipo cubre una parte de estos requisitos; gastos, devoluciones y reportes completos quedan pendientes.
 
-La aplicación frontend presenta datos de prueba en memoria. Se agregó una API REST en Python con persistencia SQLite y reglas de negocio para ventas, inventario, compras, clientes, proveedores, abonos y datos del granero. La interfaz Angular todavía debe conectarse a esa API para dejar de usar su estado en memoria. No se implementa autenticación ni análisis predictivo automático.
+> **Datos por completar:** el material fuente conserva `[nombre del negocio]` y `[nombre del propietario]` como marcadores. Deben reemplazarse antes de entregar el documento final.
 
-## Organización del frontend
+## Arquitectura
 
-La estructura principal del frontend es:
+```text
+frontend (Angular) ── HTTP/JSON ──> backend (ASP.NET Core Web API)
+                                           │
+                                    EF Core / SQL Server
+```
 
-- `pages/`: pantallas organizadas por módulo funcional.
-- `core/`: modelos del dominio, datos de prueba, formato, avisos y estado compartido de la venta en curso.
-- `shared/sidebar/`: menú lateral reutilizable y visible en toda la aplicación.
-- `app.routes.ts`: definición de rutas y navegación.
-- `app.ts`: componente raíz de la aplicación.
-- `styles.css`: estilos globales y paleta visual.
+- `frontend/`: pantallas, navegación, validaciones básicas y cliente HTTP.
+- `backend/Costalito.Api/Controllers/`: rutas y códigos HTTP.
+- `backend/Costalito.Api/Services/`: reglas de negocio y validación.
+- `backend/Costalito.Api/Repositories/`: consultas y escrituras con Entity Framework Core.
+- `backend/Costalito.Api/Data/`: contexto y mapeo de las entidades.
+- `database/`: scripts SQL de estructura y datos de demostración.
+- `DESIGN.md`: identidad visual y criterios de interfaz.
 
-Esta organización representa una primera separación de responsabilidades entre presentación, navegación y componentes visuales reutilizables. Mantiene coherencia con la arquitectura de tres capas y el patrón MVC propuestos para las siguientes fases del proyecto.
+La separación corresponde a una arquitectura por capas: la interfaz presenta los datos, la API valida y aplica reglas, y SQL Server conserva la información. La API centraliza las decisiones de stock, ventas y saldos para que las pantallas no sean la fuente de verdad.
 
-## Identidad visual
+## Funcionalidades integradas
 
-La interfaz se inspira en el costal dorado del logo: negro verdoso para la navegación, verde granero para acciones, dorado para actividad positiva y arcilla para asuntos que requieren atención. El tablero principal se organiza como una jornada de trabajo, con prioridades accionables, ventas, existencias y fiados en lugar de un dashboard genérico de tarjetas.
+La interfaz carga el estado inicial desde `/api/bootstrap` y envía operaciones de ventas, productos, clientes, proveedores, compras, abonos y configuración a la API. Las respuestas exitosas actualizan la vista; los errores de validación o conexión se muestran al usuario. La API documenta sus rutas en Swagger.
 
-El recurso de marca se encuentra en `frontend/public/brand/costalito-logo.jpg`. Las reglas visuales reutilizables están documentadas en `DESIGN.md`.
+La conexión local predeterminada del frontend apunta a `http://localhost:5257/api`. Para cambiarla, edita `API_URL` en `frontend/src/app/core/datos-granero.ts`.
 
-## Preparación para la integración
+## Requisitos
 
-Actualmente el frontend usa datos de prueba para demostrar navegación, validaciones y operaciones básicas. `core/datos-granero.ts` concentra los datos y métodos que el backend reemplazará por llamadas HTTP, sin obligar a reescribir las pantallas.
+- .NET SDK 10
+- Node.js y npm
+- SQL Server accesible desde la máquina
 
-### Entrega para backend
+## Preparación y ejecución
 
-- `backend/app.py` implementa la API REST y crea la base SQLite al iniciarse. Las instrucciones de inicio y rutas están en `backend/README.md`.
-
-- `core/modelos.ts` define las entidades que ya espera la interfaz: productos, clientes, proveedores, ventas, compras y abonos.
-- `core/datos-granero.ts` concentra las consultas y operaciones del prototipo (`registrarVenta`, `registrarAbono`, `registrarCliente`, entre otras). El backend puede conservar esta interfaz y sustituir internamente los datos en memoria por peticiones HTTP.
-- `core/avisos.ts` muestra los estados de éxito, error e información. Las pantallas no deben borrar formularios cuando una petición falle.
-- Los datos actuales viven solo durante la sesión. La API será la fuente de verdad cuando existan base de datos, autenticación y reglas finales.
-
-- `frontend/`: aplicación Angular, páginas y componentes compartidos.
-- `backend/`: carpeta reservada para la lógica de negocio y API REST.
-- `database/`: carpeta reservada para scripts de base de datos y datos de prueba.
-- `UX-CONTRACT.md`: guía de comportamiento para integrar formularios, validaciones, cargas y errores sin cambiar la experiencia visual.
-
-Durante la integración, las reglas de negocio, permisos, saldos y validaciones finales pertenecen al backend. El frontend debe mostrar las respuestas exitosas, los mensajes de validación y los errores de conexión sin borrar la información ya digitada.
-
-## Tecnologías utilizadas
-
-- Angular y TypeScript para el frontend navegable.
-- HTML y CSS para la estructura y el diseño visual.
-- Python, pandas y scikit-learn como tecnologías propuestas para un componente predictivo futuro.
-
-## Ejecución
-
-Requisitos: Git y Node.js.
-
-1. Clonar el repositorio:
+1. Copiar `backend/Costalito.Api/appsettings.Example.json` a `backend/Costalito.Api/appsettings.Development.json` si el archivo local no existe. La conexión de ejemplo usa LocalDB. El archivo de desarrollo está excluido de Git.
+2. Iniciar LocalDB:
 
    ```powershell
-   git clone https://github.com/jhuniordelgado/costalito-smart.git
+   sqllocaldb start MSSQLLocalDB
    ```
 
-2. Entrar a la carpeta del frontend e instalar dependencias:
+3. Desde la raíz, iniciar la API:
 
    ```powershell
-   cd costalito-smart/frontend
+   dotnet run --project backend/Costalito.Api --launch-profile http
+   ```
+
+   Al iniciar en Development, la API asocia una base local existente si quedó desconectada, crea las tablas que falten y carga los datos de ejemplo. La operación es idempotente y no borra los archivos de base de datos. La API queda disponible en `http://localhost:5257` y Swagger en `http://localhost:5257/swagger`. Si la terminal ya está dentro de `backend`, usa `dotnet run --project Costalito.Api --launch-profile http`.
+
+4. En otra terminal:
+
+   ```powershell
+   cd frontend
    npm install
-   ```
-
-3. Ejecutar el prototipo:
-
-   ```powershell
    npm start
    ```
 
-4. Abrir `http://localhost:4200` en el navegador.
+5. Abrir la dirección que muestre Angular. Si el puerto 4200 está ocupado y aceptas otro, la dirección será distinta; no cambia el puerto de la API.
 
-5. Para validar la compilación de producción:
+Para comprobar la compilación Angular: `cd frontend; npm run build`. Para compilar la API: `dotnet build backend/Costalito.Api/Costalito.Api.csproj`.
 
-   ```powershell
-   npm run build
-   ```
+## Pruebas de integración
 
-## Trazabilidad
+Los escenarios solicitados y el estado de verificación están en [`docs/pruebas-integracion.md`](docs/pruebas-integracion.md). La compilación de Angular se verificó. Para ejecutar y documentar las pruebas completas de persistencia es necesario tener SQL Server iniciado y accesible.
 
-- Fase 1: idea y propuesta inicial.
-- Fase 2: prototipo Angular estructurado y navegable.
-- Fases posteriores: persistencia de datos, reglas de negocio y análisis predictivo, según los requisitos definidos.
+## Seguridad y datos
 
-## Equipo de trabajo
+No guardar credenciales reales en el repositorio. `appsettings.Development.json`, secretos, `bin/` y `obj/` están excluidos por `.gitignore`. Los datos del script SQL son únicamente para demostración.
+
+## Equipo
 
 - John Alejandro Celis
 - Sebastián Cabanzo

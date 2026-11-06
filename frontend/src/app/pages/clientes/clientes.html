@@ -39,6 +39,7 @@
     <div><p class="eyebrow">Nuevo registro</p><h3 id="titulo-nuevo-cliente">Agrega un cliente al granero</h3></div>
     <form (submit)="guardar($event)">
       <label>Nombre completo <input name="nombre" required autocomplete="name"></label>
+      <label>Cédula <input name="cedula" required inputmode="numeric" autocomplete="off"></label>
       <label>Teléfono <input name="telefono" required inputmode="tel" autocomplete="tel"></label>
       <label>Límite de fiado <input name="limite" required type="number" min="1" inputmode="numeric" placeholder="Ej. 120000"></label>
       <button class="primary-button" type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar cliente' }}</button>

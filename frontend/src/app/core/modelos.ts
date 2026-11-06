@@ -5,12 +5,16 @@ export type TipoAviso = 'exito' | 'informacion' | 'error';
 
 export interface Producto {
   id: number;
+  codigo: string;
   nombre: string;
   categoria: string;
+  presentacion: string;
   unidad: string;
   existencias: number;
   minimo: number;
   precio: number;
+  precioCompra: number;
+  precioMayorista: number;
 }
 
 export interface Cliente {
@@ -98,10 +102,13 @@ export interface NuevaCompra {
   cantidad: number;
   costoUnitario: number;
   estado: EstadoCompra;
+  codigo?: string;
+  fechaVencimiento?: string;
 }
 
 export interface NuevoCliente {
   nombre: string;
+  cedula?: string;
   telefono: string;
   limite: number;
 }

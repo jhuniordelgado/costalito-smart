@@ -319,6 +319,22 @@ router-outlet + * {
   gap: 18px;
 }
 
+.registro-operacion {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.35fr);
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+.registro-operacion h3 { margin: 4px 0 0; font-size: 1.45rem; }
+.registro-operacion form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: end; }
+.registro-operacion label { display: grid; gap: 5px; font-size: 0.82rem; font-weight: 700; }
+.registro-operacion input,
+.registro-operacion select { min-height: 40px; padding: 7px 9px; background: #fffef9; border: 1px solid #bdb39f; }
+.registro-operacion input:focus,
+.registro-operacion select:focus { outline: 2px solid var(--mostaza); outline-offset: 2px; border-color: var(--verde-monte); }
+.registro-operacion .primary-button { min-height: 40px; }
+
   .formulario .doble {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -473,6 +489,9 @@ th.num {
   .formulario .doble {
     grid-template-columns: 1fr;
   }
+
+  .registro-operacion { grid-template-columns: 1fr; }
+  .registro-operacion form { grid-template-columns: 1fr; }
 
   .papel-libreta {
     padding: 20px 18px;

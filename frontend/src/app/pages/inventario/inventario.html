@@ -4,8 +4,32 @@
     <h2>Inventario</h2>
     <p>Consulta existencias y detecta a tiempo lo que necesita reposición.</p>
   </div>
-  <button class="primary-button" type="button">Agregar producto</button>
+  <button class="primary-button" type="button" (click)="formularioVisible.set(!formularioVisible())">{{ formularioVisible() ? 'Cerrar registro' : 'Agregar producto' }}</button>
 </header>
+
+@if (formularioVisible()) {
+  <section class="registro-operacion panel" aria-labelledby="titulo-nuevo-producto">
+    <div><p class="eyebrow">Nuevo registro</p><h3 id="titulo-nuevo-producto">Agrega un producto al inventario</h3></div>
+    <form (submit)="guardarProducto($event)">
+      <label>Código <input name="codigo" required></label>
+      <label>Nombre <input name="nombre" required></label>
+      <label>Categoría
+        <select name="categoria" required>
+          <option value="">Selecciona una categoría</option>
+          @for (opcion of categorias(); track opcion) { @if (opcion !== 'Todas') { <option [value]="opcion">{{ opcion }}</option> } }
+        </select>
+      </label>
+      <label>Presentación <input name="presentacion" required placeholder="Bolsa 500 g"></label>
+      <label>Unidad de venta <input name="unidad" required placeholder="unidades, libra, kilo"></label>
+      <label>Existencias <input name="existencias" type="number" min="0" step="0.001" required></label>
+      <label>Stock mínimo <input name="minimo" type="number" min="0" step="0.001" required></label>
+      <label>Precio de compra <input name="precioCompra" type="number" min="1" step="0.01" required></label>
+      <label>Precio al detal <input name="precio" type="number" min="1" step="0.01" required></label>
+      <label>Precio al por mayor <input name="precioMayorista" type="number" min="1" step="0.01" required></label>
+      <button class="primary-button" type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar producto' }}</button>
+    </form>
+  </section>
+}
 
 <section class="metrics">
   <article class="metric-card"><span class="metric-icon green" aria-hidden="true">#</span><div><p>Productos activos</p><strong>{{ datos.productos().length }}</strong><small class="positive">Disponibles en el estante</small></div></article>
