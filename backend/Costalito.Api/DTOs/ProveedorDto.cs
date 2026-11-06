@@ -2,11 +2,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Costalito.Api.DTOs;
 
-public sealed record CrearProveedorDto(
-    [property: Required, StringLength(120)] string Nombre,
-    [property: Required, StringLength(120)] string Contacto,
-    [property: Required, StringLength(30)] string Telefono,
-    [property: Required, StringLength(300)] string ProductosQueSurte);
+public sealed class CrearProveedorDto
+{
+    [Required, StringLength(120)]
+    public string Nombre { get; init; } = string.Empty;
+
+    [Required, StringLength(120)]
+    public string Contacto { get; init; } = string.Empty;
+
+    [Required, StringLength(30)]
+    public string Telefono { get; init; } = string.Empty;
+
+    [Required, StringLength(300)]
+    public string ProductosQueSurte { get; init; } = string.Empty;
+}
 
 public sealed record ProveedorDto(
     int Id, string Nombre, string Contacto, string Telefono, string Surte);

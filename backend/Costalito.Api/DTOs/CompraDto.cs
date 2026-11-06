@@ -2,14 +2,32 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Costalito.Api.DTOs;
 
-public sealed record CrearCompraDto(
-    [property: Range(1, int.MaxValue)] int ProveedorId,
-    [property: Range(1, int.MaxValue)] int ProductoId,
-    [property: Range(typeof(decimal), "0.001", "999999999")] decimal Cantidad,
-    [property: Range(typeof(decimal), "0.01", "999999999")] decimal CostoUnitario,
-    [property: Required] string Estado,
-    [property: StringLength(40)] string? Codigo = null,
-    DateOnly? FechaVencimiento = null);
+public sealed class CrearCompraDto
+{
+    [Range(1, int.MaxValue)]
+    public int ProveedorId { get; init; }
+
+    [Range(1, int.MaxValue)]
+    public int ProductoId { get; init; }
+
+    [Range(typeof(decimal), "0.001", "999999999",
+        ParseLimitsInInvariantCulture = true,
+        ConvertValueInInvariantCulture = true)]
+    public decimal Cantidad { get; init; }
+
+    [Range(typeof(decimal), "0.01", "999999999",
+        ParseLimitsInInvariantCulture = true,
+        ConvertValueInInvariantCulture = true)]
+    public decimal CostoUnitario { get; init; }
+
+    [Required]
+    public string Estado { get; init; } = string.Empty;
+
+    [StringLength(40)]
+    public string? Codigo { get; init; }
+
+    public DateOnly? FechaVencimiento { get; init; }
+}
 
 public sealed record CompraDto(
     int Id,
@@ -22,4 +40,8 @@ public sealed record CompraDto(
     int? ProductoId,
     decimal? Cantidad);
 
-public sealed record CambiarEstadoCompraDto([property: Required] string Estado);
+public sealed class CambiarEstadoCompraDto
+{
+    [Required]
+    public string Estado { get; init; } = string.Empty;
+}

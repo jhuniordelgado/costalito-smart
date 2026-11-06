@@ -2,14 +2,35 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Costalito.Api.DTOs;
 
-public sealed record CrearVentaDto(
-    int? ClienteId,
-    [property: Required] string Pago,
-    [property: Required, MinLength(1)] List<CrearLineaVentaDto> Lineas);
+public sealed class CrearVentaDto
+{
+    public int? ClienteId { get; init; }
 
-public sealed record CrearLineaVentaDto(
-    [property: Range(1, int.MaxValue)] int ProductoId,
-    [property: Range(typeof(decimal), "0.001", "999999999")] decimal Cantidad);
+    [Required]
+    public string Pago { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public List<CrearLineaVentaDto> Lineas { get; init; } = [];
+}
+
+public sealed class CrearLineaVentaDto
+{
+    public CrearLineaVentaDto() { }
+
+    public CrearLineaVentaDto(int productoId, decimal cantidad)
+    {
+        ProductoId = productoId;
+        Cantidad = cantidad;
+    }
+
+    [Range(1, int.MaxValue)]
+    public int ProductoId { get; init; }
+
+    [Range(typeof(decimal), "0.001", "999999999",
+        ParseLimitsInInvariantCulture = true,
+        ConvertValueInInvariantCulture = true)]
+    public decimal Cantidad { get; init; }
+}
 
 public sealed record LineaVentaDto(int ProductoId, string Nombre, decimal Cantidad, decimal Precio);
 

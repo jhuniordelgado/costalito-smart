@@ -4,16 +4,20 @@ API REST en ASP.NET Core 10 con EF Core y SQL Server. La solución separa contro
 
 ## Configuración local
 
-1. Ejecuta `database/01_crear_estructura.sql` y `database/02_datos_prueba.sql` en SQL Server.
-2. Ejecuta `database/03_reparar_nombres_seed.sql` para normalizar los acentos de los datos de ejemplo si la herramienta SQL alteró la codificación.
-3. Copia `Costalito.Api/appsettings.Example.json` como `Costalito.Api/appsettings.Development.json` y ajusta el servidor si hace falta. Ese archivo local está excluido de Git.
-4. Desde la raíz del repositorio, inicia la API:
+1. Copia `Costalito.Api/appsettings.Example.json` como `Costalito.Api/appsettings.Development.json` si el archivo local no existe. La conexión de ejemplo usa LocalDB; el archivo local está excluido de Git.
+2. Inicia LocalDB:
 
 ```powershell
-dotnet run --project backend/Costalito.Api
+sqllocaldb start MSSQLLocalDB
 ```
 
-La documentación interactiva se publica en `/swagger`. Angular corre en `http://localhost:4200`; ese origen está habilitado en CORS.
+3. Desde la raíz del repositorio, inicia la API:
+
+```powershell
+dotnet run --project backend/Costalito.Api --launch-profile http
+```
+
+Al iniciar en Development, la API vuelve a asociar los archivos de una base local desconectada si están presentes, crea las tablas que falten y carga los datos de ejemplo. El proceso es idempotente y no borra los archivos de datos. Si la terminal ya está dentro de `backend`, usa `dotnet run --project Costalito.Api --launch-profile http`. La API queda en `http://localhost:5257` y Swagger en `/swagger`. Angular puede usar otro puerto local si 4200 está ocupado; los orígenes localhost de desarrollo están habilitados en CORS.
 
 También puedes configurar la cadena sin archivo local con la variable de entorno `ConnectionStrings__Costalito`.
 

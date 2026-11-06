@@ -50,6 +50,16 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    var scriptsDirectory = Path.Combine(AppContext.BaseDirectory, "database");
+    await DatabaseInitializer.InitializeAsync(
+        connectionString,
+        scriptsDirectory,
+        app.Logger,
+        app.Lifetime.ApplicationStopping);
+}
+
 app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseCors("Frontend");
 app.UseSwagger();

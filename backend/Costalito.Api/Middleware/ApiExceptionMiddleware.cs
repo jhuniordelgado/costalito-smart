@@ -20,19 +20,20 @@ public sealed class ApiExceptionMiddleware(
         }
         catch (DbUpdateException error)
         {
+            var detalle = DetalleEnDesarrollo(context, error);
             if (ContieneErrorSql(error))
             {
                 logger.LogError(error, "No fue posible completar la operación en SQL Server.");
                 await EscribirErrorAsync(
                     context, StatusCodes.Status500InternalServerError,
-                    "No fue posible conectar con la base de datos. Intenta de nuevo más tarde.");
+                    "No fue posible completar el cambio en la base de datos.", detalle);
             }
             else
             {
                 logger.LogWarning(error, "La base de datos rechazó una operación.");
                 await EscribirErrorAsync(
                     context, StatusCodes.Status409Conflict,
-                    "No se pudo guardar el registro. Revisa que no exista un dato duplicado.");
+                    "No se pudo guardar el registro. Revisa los datos e intenta de nuevo.", detalle);
             }
         }
         catch (SqlException error)
@@ -40,7 +41,8 @@ public sealed class ApiExceptionMiddleware(
             logger.LogError(error, "No fue posible conectar con SQL Server.");
             await EscribirErrorAsync(
                 context, StatusCodes.Status500InternalServerError,
-                "No fue posible conectar con la base de datos. Intenta de nuevo más tarde.");
+                "No fue posible completar el cambio en la base de datos.",
+                DetalleEnDesarrollo(context, error));
         }
         catch (Exception error)
         {
@@ -63,6 +65,11 @@ public sealed class ApiExceptionMiddleware(
         }
         return false;
     }
+
+    private static string? DetalleEnDesarrollo(HttpContext context, Exception error) =>
+        context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment()
+            ? error.ToString()
+            : null;
 
     private static async Task EscribirErrorAsync(
         HttpContext context, int status, string message, string? detalle = null)

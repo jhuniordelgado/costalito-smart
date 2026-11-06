@@ -8,7 +8,7 @@ import {
 } from './modelos';
 import { pesos, plural } from './formato';
 
-const API_URL = 'http://localhost:5256/api';
+const API_URL = 'http://localhost:5257/api';
 
 interface DatosIniciales {
   granero: Granero;
@@ -339,8 +339,17 @@ export class DatosGranero {
 
   private detalleError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      const detalle = error.error?.error;
-      if (typeof detalle === 'string') return detalle;
+      const mensaje = error.error?.error;
+      const detalle = error.error?.detalle;
+      if (typeof mensaje === 'string' && typeof detalle === 'string') {
+        // La API solo manda el detalle técnico en Development; ayuda a encontrar
+        // fallos de SQL sin mostrar excepciones internas a usuarios del despliegue.
+        const lineaUtil = detalle.split(/\r?\n/)
+          .map((linea: string) => linea.trim())
+          .find((linea: string) => /Exception:|error SQL|Cannot|Invalid|Violation|The .* statement conflicted/i.test(linea));
+        return lineaUtil ? `${mensaje} (${lineaUtil.slice(0, 240)})` : mensaje;
+      }
+      if (typeof mensaje === 'string') return mensaje;
       if (error.status === 0) {
         return 'No hay conexión con el servidor. Revisa que el backend esté iniciado e inténtalo de nuevo.';
       }
