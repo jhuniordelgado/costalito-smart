@@ -1,4 +1,4 @@
-const formatoPesos = new Intl.NumberFormat('es-CO', {
+0const formatoPesos = new Intl.NumberFormat('es-CO', {
   style: 'currency',
   currency: 'COP',
   maximumFractionDigits: 0,
