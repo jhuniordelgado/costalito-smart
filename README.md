@@ -14,7 +14,6 @@ Las respuestas se transcribieron con Whisper y se organizaron por pregunta. El d
 
 Hallazgos principales: registrar cantidades, códigos, presentaciones, precios y vencimientos; documentar pérdidas y devoluciones; gestionar facturas de compra, proveedores, abonos y saldos; calcular ventas con varios productos; consultar los fiados por cliente; registrar gastos y consultar movimientos por período. La entrevista indicó márgenes habituales del 10 % por unidad y 5 % al por mayor. El prototipo cubre una parte de estos requisitos; gastos, devoluciones y reportes completos quedan pendientes.
 
-> **Datos por completar:** el material fuente conserva `[nombre del negocio]` y `[nombre del propietario]` como marcadores. Deben reemplazarse antes de entregar el documento final.
 
 ## Arquitectura
 
