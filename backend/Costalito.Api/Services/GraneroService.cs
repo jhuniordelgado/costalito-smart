@@ -1,25 +1,35 @@
 using Costalito.Api.DTOs;
 using Costalito.Api.Models;
 using Costalito.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Costalito.Api.Services;
 
-public sealed class GraneroService(IGraneroRepository repository) : IGraneroService
+public sealed class GraneroService(
+    IGraneroRepository repository,
+    IRelojGranero reloj,
+    IOptions<OpcionesGranero> opciones) : IGraneroService
 {
     private static readonly HashSet<string> MediosPago = ["Efectivo", "Nequi", "Fiado"];
     private static readonly HashSet<string> EstadosCompra = ["En camino", "Recibida", "Pendiente de pago"];
+    private const int IntentosPorConflicto = 5;
 
     public async Task<DatosInicialesDto> ObtenerDatosInicialesAsync(CancellationToken cancellationToken)
     {
+        // Ventas y abonos crecen todos los días: al abrir la aplicación solo viajan los
+        // recientes. Los saldos no dependen de esto porque la API los calcula con todo el historial.
+        var desde = reloj.Hoy.AddDays(-(opciones.Value.DiasHistorialInicial - 1));
+
         var granero = await ObtenerGraneroAsync(cancellationToken);
         var productos = await ObtenerProductosAsync(cancellationToken);
         var clientes = await ObtenerClientesAsync(cancellationToken);
         var proveedores = await ObtenerProveedoresAsync(cancellationToken);
-        var ventas = await ObtenerVentasAsync(cancellationToken);
+        var ventas = await ObtenerVentasAsync(desde, null, cancellationToken);
         var compras = await ObtenerComprasAsync(cancellationToken);
-        var abonos = await ObtenerAbonosAsync(cancellationToken);
+        var abonos = await ObtenerAbonosAsync(desde, null, cancellationToken);
 
-        return new DatosInicialesDto(granero, productos, clientes, proveedores, ventas, compras, abonos);
+        return new DatosInicialesDto(granero, productos, clientes, proveedores, ventas, compras, abonos, desde);
     }
 
     public async Task<IReadOnlyList<ProductoDto>> ObtenerProductosAsync(CancellationToken cancellationToken)
@@ -46,9 +56,11 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         return proveedores.Select(AProveedorDto).ToList();
     }
 
-    public async Task<IReadOnlyList<VentaDto>> ObtenerVentasAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<VentaDto>> ObtenerVentasAsync(
+        DateOnly? desde, DateOnly? hasta, CancellationToken cancellationToken)
     {
-        var ventas = await repository.ObtenerVentasAsync(cancellationToken);
+        var (inicio, finSin) = Periodo(desde, hasta);
+        var ventas = await repository.ObtenerVentasAsync(inicio, finSin, cancellationToken);
         return ventas.Select(AVentaDto).ToList();
     }
 
@@ -58,9 +70,11 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         return compras.Select(ACompraDto).ToList();
     }
 
-    public async Task<IReadOnlyList<AbonoDto>> ObtenerAbonosAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<AbonoDto>> ObtenerAbonosAsync(
+        DateOnly? desde, DateOnly? hasta, CancellationToken cancellationToken)
     {
-        var abonos = await repository.ObtenerAbonosClientesAsync(cancellationToken);
+        var (inicio, finSin) = Periodo(desde, hasta);
+        var abonos = await repository.ObtenerAbonosClientesAsync(inicio, finSin, cancellationToken);
         return abonos.Select(abono => new AbonoDto(
             abono.AbonoClienteId, abono.ClienteId, abono.Monto, abono.FechaHora)).ToList();
     }
@@ -139,7 +153,11 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         return AProveedorDto(proveedor);
     }
 
-    public async Task<VentaDto> RegistrarVentaAsync(
+    public Task<VentaDto> RegistrarVentaAsync(
+        CrearVentaDto datos, CancellationToken cancellationToken) =>
+        ConReintentoAsync(() => IntentarRegistrarVentaAsync(datos, cancellationToken));
+
+    private async Task<VentaDto> IntentarRegistrarVentaAsync(
         CrearVentaDto datos, CancellationToken cancellationToken)
     {
         if (!MediosPago.Contains(datos.Pago))
@@ -173,20 +191,24 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
             });
         }
 
+        var ahora = reloj.Ahora;
         var total = lineas.Sum(linea => linea.Cantidad * linea.PrecioUnitario);
         if (cliente is not null)
         {
             var saldo = await repository.SaldoClienteAsync(cliente.ClienteId, cancellationToken);
             if (saldo + total > cliente.LimiteFiado)
                 throw new ApiException($"{cliente.Nombre} superaría su límite de fiado.", 400);
+            // Se actualiza la fila del cliente para que su RowVersion detecte otro fiado o
+            // abono simultáneo que haya validado el saldo con el mismo dato.
+            cliente.UltimoMovimiento = ahora;
         }
 
         var venta = new Venta
         {
-            Codigo = $"V-{DateTime.UtcNow:yyyyMMddHHmmssfff}",
+            Codigo = $"V-{ahora:yyyyMMddHHmmssfff}",
             ClienteId = cliente?.ClienteId,
             Cliente = cliente,
-            FechaHora = DateTime.Now,
+            FechaHora = ahora,
             MedioPago = datos.Pago,
             Total = total,
             Detalles = lineas,
@@ -196,7 +218,11 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         return AVentaDto(venta);
     }
 
-    public async Task<CompraDto> RegistrarCompraAsync(
+    public Task<CompraDto> RegistrarCompraAsync(
+        CrearCompraDto datos, CancellationToken cancellationToken) =>
+        ConReintentoAsync(() => IntentarRegistrarCompraAsync(datos, cancellationToken));
+
+    private async Task<CompraDto> IntentarRegistrarCompraAsync(
         CrearCompraDto datos, CancellationToken cancellationToken)
     {
         if (!EstadosCompra.Contains(datos.Estado))
@@ -218,12 +244,12 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         var compra = new Compra
         {
             Codigo = string.IsNullOrWhiteSpace(datos.Codigo)
-                ? $"FC-{DateTime.UtcNow:yyyyMMddHHmmssfff}"
+                ? $"FC-{reloj.Ahora:yyyyMMddHHmmssfff}"
                 : datos.Codigo.Trim(),
             ProveedorId = proveedor.ProveedorId,
             Proveedor = proveedor,
-            FechaFactura = DateOnly.FromDateTime(DateTime.Today),
-            FechaRecepcion = datos.Estado == "En camino" ? null : DateOnly.FromDateTime(DateTime.Today),
+            FechaFactura = reloj.Hoy,
+            FechaRecepcion = datos.Estado == "En camino" ? null : reloj.Hoy,
             Estado = datos.Estado,
             Total = datos.Cantidad * datos.CostoUnitario,
             Detalles = [detalle],
@@ -236,7 +262,15 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         return ACompraDto(compra);
     }
 
-    public async Task CambiarEstadoCompraAsync(
+    public Task CambiarEstadoCompraAsync(
+        int id, string estado, CancellationToken cancellationToken) =>
+        ConReintentoAsync(async () =>
+        {
+            await IntentarCambiarEstadoCompraAsync(id, estado, cancellationToken);
+            return true;
+        });
+
+    private async Task IntentarCambiarEstadoCompraAsync(
         int id, string estado, CancellationToken cancellationToken)
     {
         if (!EstadosCompra.Contains(estado))
@@ -255,14 +289,18 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
                 if (producto is not null)
                     producto.Existencias += detalle.Cantidad;
             }
-            compra.FechaRecepcion = DateOnly.FromDateTime(DateTime.Today);
+            compra.FechaRecepcion = reloj.Hoy;
         }
 
         compra.Estado = estado;
         await repository.GuardarCambiosAsync(cancellationToken);
     }
 
-    public async Task<AbonoDto> RegistrarAbonoAsync(
+    public Task<AbonoDto> RegistrarAbonoAsync(
+        CrearAbonoDto datos, CancellationToken cancellationToken) =>
+        ConReintentoAsync(() => IntentarRegistrarAbonoAsync(datos, cancellationToken));
+
+    private async Task<AbonoDto> IntentarRegistrarAbonoAsync(
         CrearAbonoDto datos, CancellationToken cancellationToken)
     {
         var cliente = await repository.BuscarClienteAsync(datos.ClienteId, cancellationToken)
@@ -271,10 +309,12 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         if (datos.Monto > saldo)
             throw new ApiException($"El abono no puede pasar del saldo ({saldo:C0}).", 400);
 
+        var ahora = reloj.Ahora;
+        cliente.UltimoMovimiento = ahora;
         var abono = new AbonoCliente
         {
             ClienteId = cliente.ClienteId,
-            FechaHora = DateTime.Now,
+            FechaHora = ahora,
             Monto = datos.Monto,
         };
         await repository.GuardarAbonoClienteAsync(abono, cancellationToken);
@@ -295,6 +335,38 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
         configuracion.HoraCierre = cierre;
         await repository.GuardarConfiguracionAsync(configuracion, cancellationToken);
         return AGraneroDto(configuracion);
+    }
+
+    /// <summary>
+    /// Si otra petición cambió un producto entre la lectura y el guardado (el RowVersion
+    /// ya no coincide), se descarta lo cargado y se repite la operación completa con datos
+    /// frescos: así la venta vuelve a revisar las existencias reales y una compra que ya se
+    /// recibió no suma el stock dos veces. Si el conflicto persiste, el middleware responde 409.
+    /// </summary>
+    private async Task<T> ConReintentoAsync<T>(Func<Task<T>> operacion)
+    {
+        for (var intento = 1; ; intento++)
+        {
+            try
+            {
+                return await operacion();
+            }
+            catch (DbUpdateConcurrencyException) when (intento < IntentosPorConflicto)
+            {
+                repository.DescartarCambios();
+                // Espera corta y aleatoria para que las peticiones que chocaron no vuelvan
+                // a leer y guardar exactamente al mismo tiempo.
+                await Task.Delay(Random.Shared.Next(10, 40) * intento);
+            }
+        }
+    }
+
+    /// <summary>Días incluidos → [inicio del primer día, inicio del día siguiente al último).</summary>
+    private static (DateTime? Inicio, DateTime? FinSin) Periodo(DateOnly? desde, DateOnly? hasta)
+    {
+        if (desde is not null && hasta is not null && desde > hasta)
+            throw new ApiException("La fecha inicial no puede ser posterior a la final.", 400);
+        return (desde?.ToDateTime(TimeOnly.MinValue), hasta?.AddDays(1).ToDateTime(TimeOnly.MinValue));
     }
 
     private static ProductoDto AProductoDto(Producto producto) => new(
@@ -323,7 +395,7 @@ public sealed class GraneroService(IGraneroRepository repository) : IGraneroServ
             $"{item.Producto?.Nombre ?? "Producto"} × {item.Cantidad:g}"));
         var primeraLinea = compra.Detalles.FirstOrDefault();
         return new CompraDto(
-            compra.CompraId, $"#C-{compra.Codigo}", compra.ProveedorId,
+            compra.CompraId, $"#{compra.Codigo}", compra.ProveedorId,
             compra.FechaFactura, compra.Total, compra.Estado, detalle,
             compra.Detalles.Count == 1 ? primeraLinea?.ProductoId : null,
             compra.Detalles.Count == 1 ? primeraLinea?.Cantidad : compra.Detalles.Sum(item => item.Cantidad));

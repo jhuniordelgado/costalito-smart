@@ -6,14 +6,23 @@ Prototipo de gestión comercial para un granero familiar — Arquitectura de Sof
 
 Costalito Smart reúne módulos de inventario, ventas, compras, clientes, proveedores, créditos y reportes en una aplicación web. La Fase 4 integra la interfaz Angular con una API REST en ASP.NET Core y una base de datos SQL Server.
 
+## Navegación
+
+- [Requisitos y pasos para ejecutar la aplicación](#requisitos)
+- [Arquitectura](#arquitectura)
+- [Funcionalidades integradas](#funcionalidades-integradas)
+- [Levantamiento de información](#levantamiento-de-información)
+- [Pruebas de integración](#pruebas-de-integración)
+
 ## Levantamiento de información
 
-Los requisitos iniciales se recogieron del propietario del negocio mediante **52 notas de voz de WhatsApp**, grabadas el **19 de octubre de 2026 entre las 6:12 p. m. y las 7:09 p. m.**. Las notas responden a un cuestionario de 50 preguntas distribuidas en nueve temas: productos, existencias, precios, compras, proveedores y pagos, ventas, clientes y fiados, gastos y reportes, y datos de los comprobantes.
+El análisis de necesidades se basa en una entrevista al propietario de Granero Genith, registrada en 52 notas de voz de WhatsApp y organizada en un cuestionario de 50 preguntas.
 
-Las respuestas se transcribieron con Whisper y se organizaron por pregunta. El documento de levantamiento identifica los audios relacionados con cada respuesta para contrastar la transcripción con la fuente original. La carpeta prevista para conservar esos audios es `evidencias/audios`.
+Las respuestas se transcribieron con Whisper y se organizaron por pregunta. El documento de levantamiento identifica los audios relacionados con cada respuesta para contrastar la transcripción con la fuente original.
 
 Hallazgos principales: registrar cantidades, códigos, presentaciones, precios y vencimientos; documentar pérdidas y devoluciones; gestionar facturas de compra, proveedores, abonos y saldos; calcular ventas con varios productos; consultar los fiados por cliente; registrar gastos y consultar movimientos por período. La entrevista indicó márgenes habituales del 10 % por unidad y 5 % al por mayor. El prototipo cubre una parte de estos requisitos; gastos, devoluciones y reportes completos quedan pendientes.
 
+El documento con las preguntas, las respuestas registradas, las referencias de audio y la síntesis de necesidades está en [docs/levantamiento-informacion.md](docs/levantamiento-informacion.md). La carpeta destinada a conservar los audios originales es [evidencias/audios](evidencias/audios/README.md).
 
 ## Arquitectura
 
@@ -50,28 +59,51 @@ Todas las pantallas del granero exigen sesión. La ruta `/entrar` muestra el for
 
 ## Requisitos
 
-- .NET SDK 10
-- Node.js y npm
-- SQL Server accesible desde la máquina
+- Windows con SQL Server Express LocalDB instalado (la configuración predeterminada usa LocalDB).
+- .NET SDK 10.
+- Node.js y npm.
+- Git, para clonar el repositorio.
+
+Puedes comprobar las herramientas desde PowerShell:
+
+```powershell
+dotnet --list-sdks
+node --version
+npm --version
+sqllocaldb info MSSQLLocalDB
+```
 
 ## Preparación y ejecución
 
-1. Copiar `backend/Costalito.Api/appsettings.Example.json` a `backend/Costalito.Api/appsettings.Development.json` si el archivo local no existe. La conexión de ejemplo usa LocalDB. El archivo de desarrollo está excluido de Git.
+> **Importante:** `appsettings.Development.json` no viene en el repositorio porque está excluido de Git. Cada desarrollador crea su copia local a partir de `appsettings.Example.json`.
+
+Abre PowerShell en la carpeta raíz del repositorio (`costalito-smart`) y ejecuta:
+
+1. Crear el archivo local de configuración (el comando conserva el archivo si ya existe):
+
+   ```powershell
+   if (-not (Test-Path backend/Costalito.Api/appsettings.Development.json)) {
+       Copy-Item backend/Costalito.Api/appsettings.Example.json backend/Costalito.Api/appsettings.Development.json
+   }
+   ```
+
+   La configuración de ejemplo usa SQL Server LocalDB. Si usas otro SQL Server, ajusta `ConnectionStrings:Costalito` en el archivo local. Este archivo está ignorado por Git y no se comparte al clonar.
+
 2. Iniciar LocalDB:
 
    ```powershell
    sqllocaldb start MSSQLLocalDB
    ```
 
-3. Desde la raíz, iniciar la API:
+3. Desde esa misma raíz, iniciar la API:
 
    ```powershell
    dotnet run --project backend/Costalito.Api --launch-profile http
    ```
 
-   Al iniciar en Development, la API asocia una base local existente si quedó desconectada, crea las tablas que falten y carga los datos de ejemplo. La operación es idempotente y no borra los archivos de base de datos. La API queda disponible en `http://localhost:5257` y Swagger en `http://localhost:5257/swagger`. Si la terminal ya está dentro de `backend`, usa `dotnet run --project Costalito.Api --launch-profile http`.
+   El perfil `http` activa el entorno `Development`. En ese entorno, al iniciar la API se ejecutan los scripts SQL: se crea `CostalitoSmart` y las tablas que falten, y se insertan los datos de demostración que no existan. Si los archivos de una base local están desconectados, la API intenta asociarlos. La inicialización es idempotente y no borra los archivos de datos. La API queda disponible en `http://localhost:5257` y Swagger en `http://localhost:5257/swagger`. Si la terminal ya está dentro de `backend`, usa `dotnet run --project Costalito.Api --launch-profile http`.
 
-4. En otra terminal:
+4. Con la API aún ejecutándose, abre **otra terminal** en la raíz e inicia Angular:
 
    ```powershell
    cd frontend
@@ -81,11 +113,33 @@ Todas las pantallas del granero exigen sesión. La ruta `/entrar` muestra el for
 
 5. Abrir la dirección que muestre Angular. Si el puerto 4200 está ocupado y aceptas otro, la dirección será distinta; no cambia el puerto de la API.
 
-Para comprobar la compilación Angular: `cd frontend; npm run build`. Para compilar la API: `dotnet build backend/Costalito.Api/Costalito.Api.csproj`.
+   `npm install` solo es necesario la primera vez o cuando cambien las dependencias. Angular mostrará en la terminal la URL local, normalmente `http://localhost:4200`.
+
+### Arrancar en otro computador
+
+Cada computador necesita sus propias herramientas y su propia base LocalDB. Instala los requisitos anteriores, clona el repositorio y ejecuta los pasos de configuración y arranque de esta sección. En el primer inicio, la API crea una base nueva con datos de demostración.
+
+Los registros creados en un computador no se copian al otro: LocalDB guarda los datos localmente. Para trasladar datos reales, realiza un respaldo de SQL Server y restáuralo en el otro equipo; cambiar o copiar `appsettings.Development.json` por sí solo no transfiere la base.
+
+Para detener la base local, ejecuta `sqllocaldb stop MSSQLLocalDB`. Para volver a iniciarla, usa `sqllocaldb start MSSQLLocalDB`.
+
+### Compilar
+
+Desde la raíz del repositorio:
+
+```powershell
+dotnet build backend/Costalito.Api/Costalito.Api.csproj
+```
+
+Desde `frontend/`:
+
+```powershell
+npm run build
+```
 
 ## Pruebas de integración
 
-Los escenarios solicitados y el estado de verificación están en [`docs/pruebas-integracion.md`](docs/pruebas-integracion.md). La compilación de Angular se verificó. Para ejecutar y documentar las pruebas completas de persistencia es necesario tener SQL Server iniciado y accesible.
+Los escenarios y su estado están documentados en [`docs/pruebas-integracion.md`](docs/pruebas-integracion.md). Para ejecutar las pruebas de persistencia, SQL Server debe estar iniciado y accesible.
 
 ## Seguridad y datos
 

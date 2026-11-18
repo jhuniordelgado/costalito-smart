@@ -41,11 +41,20 @@ BEGIN
         PrecioVenta DECIMAL(12,2) NOT NULL,
         PrecioMayorista DECIMAL(12,2) NOT NULL,
         Activo BIT NOT NULL CONSTRAINT DF_Productos_Activo DEFAULT (1),
+        RowVersion ROWVERSION NOT NULL,
         CONSTRAINT FK_Productos_Categorias FOREIGN KEY (CategoriaId) REFERENCES dbo.Categorias(CategoriaId),
         CONSTRAINT CK_Productos_Existencias CHECK (Existencias >= 0),
         CONSTRAINT CK_Productos_StockMinimo CHECK (StockMinimo >= 0),
         CONSTRAINT CK_Productos_Precios CHECK (PrecioCompra > 0 AND PrecioVenta > 0 AND PrecioMayorista > 0)
     );
+END;
+GO
+
+-- Bases creadas antes de agregar el token de concurrencia: SQL Server llena la
+-- columna automáticamente en las filas que ya existen.
+IF COL_LENGTH(N'dbo.Productos', N'RowVersion') IS NULL
+BEGIN
+    ALTER TABLE dbo.Productos ADD RowVersion ROWVERSION NOT NULL;
 END;
 GO
 
@@ -59,9 +68,24 @@ BEGIN
         LimiteFiado DECIMAL(12,2) NOT NULL CONSTRAINT DF_Clientes_LimiteFiado DEFAULT (0),
         SaldoInicial DECIMAL(12,2) NOT NULL CONSTRAINT DF_Clientes_SaldoInicial DEFAULT (0),
         Activo BIT NOT NULL CONSTRAINT DF_Clientes_Activo DEFAULT (1),
+        UltimoMovimiento DATETIME2 NULL,
+        RowVersion ROWVERSION NOT NULL,
         CONSTRAINT CK_Clientes_Limite CHECK (LimiteFiado >= 0),
         CONSTRAINT CK_Clientes_Saldo CHECK (SaldoInicial >= 0)
     );
+END;
+GO
+
+-- Bases creadas antes de proteger el saldo de fiado contra operaciones simultáneas.
+IF COL_LENGTH(N'dbo.Clientes', N'UltimoMovimiento') IS NULL
+BEGIN
+    ALTER TABLE dbo.Clientes ADD UltimoMovimiento DATETIME2 NULL;
+END;
+GO
+
+IF COL_LENGTH(N'dbo.Clientes', N'RowVersion') IS NULL
+BEGIN
+    ALTER TABLE dbo.Clientes ADD RowVersion ROWVERSION NOT NULL;
 END;
 GO
 

@@ -8,10 +8,12 @@ namespace Costalito.Api.Controllers;
 [Route("api/sales")]
 public sealed class VentasController(IGraneroService service) : ControllerBase
 {
+    /// <summary>Ventas de un periodo (días incluidos, formato AAAA-MM-DD). Sin fechas, todas.</summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<VentaDto>>(StatusCodes.Status200OK)]
-    public Task<IReadOnlyList<VentaDto>> Get(CancellationToken cancellationToken) =>
-        service.ObtenerVentasAsync(cancellationToken);
+    public Task<IReadOnlyList<VentaDto>> Get(
+        [FromQuery] DateOnly? desde, [FromQuery] DateOnly? hasta, CancellationToken cancellationToken) =>
+        service.ObtenerVentasAsync(desde, hasta, cancellationToken);
 
     [HttpPost]
     [ProducesResponseType<VentaDto>(StatusCodes.Status201Created)]

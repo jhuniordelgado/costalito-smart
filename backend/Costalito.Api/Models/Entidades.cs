@@ -22,6 +22,12 @@ public sealed class Producto
     public decimal PrecioVenta { get; set; }
     public decimal PrecioMayorista { get; set; }
     public bool Activo { get; set; } = true;
+    /// <summary>
+    /// Token de concurrencia: SQL Server lo cambia en cada UPDATE. Si dos cajas venden
+    /// el mismo producto a la vez, la segunda en guardar recibe un conflicto en vez de
+    /// pisar las existencias que dejó la primera.
+    /// </summary>
+    public byte[] RowVersion { get; set; } = [];
     public Categoria? Categoria { get; set; }
     public List<DetalleVenta> DetallesVenta { get; set; } = [];
     public List<DetalleCompra> DetallesCompra { get; set; } = [];
@@ -36,6 +42,13 @@ public sealed class Cliente
     public decimal LimiteFiado { get; set; }
     public decimal SaldoInicial { get; set; }
     public bool Activo { get; set; } = true;
+    /// <summary>Último fiado o abono. Al cambiarlo, SQL Server renueva el RowVersion.</summary>
+    public DateTime? UltimoMovimiento { get; set; }
+    /// <summary>
+    /// Token de concurrencia: dos fiados o abonos simultáneos del mismo cliente no pueden
+    /// validar su saldo con el mismo dato; el segundo en guardar se repite con el saldo real.
+    /// </summary>
+    public byte[] RowVersion { get; set; } = [];
     public List<Venta> Ventas { get; set; } = [];
     public List<AbonoCliente> Abonos { get; set; } = [];
 }

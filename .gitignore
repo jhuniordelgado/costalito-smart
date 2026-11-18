@@ -14,3 +14,8 @@ backend/*.sqlite3-wal
 .venv/
 __pycache__/
 .claude/
+
+# Carpetas de trabajo temporales (revisión de PDF, imágenes y scripts de apoyo)
+.pdf-review/
+.review-assets/
+.tmp/

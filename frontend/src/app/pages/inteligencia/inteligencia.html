@@ -12,7 +12,7 @@
     <p class="eyebrow">Lectura del día</p>
     <span class="analysis-mark">{{ datos.senales().length.toString().padStart(2, '0') }}</span>
     <h3>Señales claras<br>para actuar.</h3>
-    <p>Este resumen cambia cuando registras ventas, bajas existencias o registras abonos. En la siguiente fase, se alimentará desde la API.</p>
+    <p>Este resumen cambia cuando registras ventas, bajas existencias o registras abonos. Las compras sugeridas vienen del servicio inteligente, que lee las ventas de la base.</p>
   </article>
 
   <div class="signal-list">
@@ -21,7 +21,7 @@
         <span class="signal-index">{{ ($index + 1).toString().padStart(2, '0') }} · {{ senal.rotulo }}</span>
         <h3>{{ senal.titulo }}</h3>
         <p>{{ senal.detalle }}</p>
-        <a [routerLink]="senal.ruta">{{ senal.enlace }} <b aria-hidden="true">→</b></a>
+        <a [routerLink]="senal.ruta" [fragment]="senal.fragmento">{{ senal.enlace }} <b aria-hidden="true">→</b></a>
       </article>
     } @empty {
       <article class="signal-empty"><strong>Todo está al día.</strong><p>No hay señales pendientes en este momento.</p></article>
@@ -29,10 +29,12 @@
   </div>
 </section>
 
+<app-predicciones-compra />
+
 <section class="analysis-footnote">
   <p class="eyebrow">Cómo leer este módulo</p>
   <div>
-    <strong>Hoy funciona con datos de prueba.</strong>
-    <p>Cuando el backend esté conectado, conservará esta vista y alimentará las señales con ventas, existencias y créditos reales.</p>
+    <strong>Las señales salen de los datos del granero.</strong>
+    <p>Existencias, fiados y compras se calculan con lo registrado en la aplicación. La predicción de compra la hace el servicio inteligente: mira las ventas de las últimas 4 semanas, lo que hay y lo que está en camino, y los días que tarda cada proveedor. Es apoyo: la compra final la decides tú.</p>
   </div>
 </section>

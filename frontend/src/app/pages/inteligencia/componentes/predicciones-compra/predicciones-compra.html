@@ -1,0 +1,96 @@
+<section class="ia" id="predicciones" aria-labelledby="titulo-ia" [attr.aria-busy]="ia.cargando()">
+  <header class="ia-cabecera">
+    <div>
+      <p class="eyebrow">Servicio inteligente · demanda de la semana</p>
+      <h3 id="titulo-ia">Qué comprar y cuándo.</h3>
+    </div>
+    <div class="ia-acciones">
+      @if (ia.estado(); as estado) {
+        <span class="ia-hora">Consultado {{ hora(estado.consultado) }}</span>
+      }
+      <button type="button" class="boton boton--claro boton--chico" (click)="ia.cargar(true)" [disabled]="ia.cargando()">
+        {{ ia.cargando() ? 'Consultando…' : 'Actualizar' }}
+      </button>
+    </div>
+  </header>
+
+  @if (ia.error()) {
+    <div class="ia-aviso" role="alert">
+      <strong>No se pudieron pedir las predicciones.</strong>
+      <p>{{ ia.error() }}</p>
+    </div>
+  }
+
+  @if (ia.estado(); as estado) {
+    @if (!estado.disponible) {
+      <div class="ia-aviso" role="status">
+        <strong>El servicio inteligente no está disponible.</strong>
+        <p>{{ estado.mensaje }}</p>
+        <p class="ia-aviso-nota">Las demás señales de esta página siguen funcionando con los datos del granero.</p>
+      </div>
+    } @else {
+      <dl class="ia-resumen">
+        <div class="ia-resumen-celda ia-resumen-celda--hoy">
+          <dt>Comprar hoy</dt>
+          <dd>{{ ia.comprarHoy().length }}</dd>
+        </div>
+        <div class="ia-resumen-celda ia-resumen-celda--semana">
+          <dt>Esta semana</dt>
+          <dd>{{ ia.estaSemana().length }}</dd>
+        </div>
+        <div class="ia-resumen-celda ia-resumen-celda--bien">
+          <dt>Cubiertos</dt>
+          <dd>{{ ia.cubiertos().length }}</dd>
+        </div>
+        <div class="ia-resumen-celda ia-resumen-metodo">
+          <dt>Cómo predice</dt>
+          <dd>{{ metodoCorto() }}</dd>
+          <dd class="ia-resumen-nota">{{ metodoDetalle() }}</dd>
+        </div>
+      </dl>
+
+      <ol class="ia-lista">
+        @for (prediccion of ia.recomendaciones(); track prediccion.codigo) {
+          <li class="ia-item ia-item--{{ urgencia(prediccion).clase }}">
+            <div class="ia-producto">
+              <span class="sello {{ urgencia(prediccion).sello }}">{{ urgencia(prediccion).rotulo }}</span>
+              <h4>{{ prediccion.producto }}</h4>
+              <span class="ia-codigo">{{ prediccion.codigo }}</span>
+            </div>
+
+            <div class="ia-decision">
+              <strong>{{ accion(prediccion) }}</strong>
+              <span>{{ contexto(prediccion) }}</span>
+            </div>
+
+            <figure class="ia-grafica">
+              <div class="ia-barras" role="img" [attr.aria-label]="descripcionGrafica(prediccion)">
+                @for (barra of barras(prediccion); track $index) {
+                  <div class="ia-barra" [class.ia-barra--prevista]="barra.prevista">
+                    <span class="ia-barra-valor">{{ formato(barra.valor) }}</span>
+                    <span class="ia-barra-relleno" [style.height.%]="barra.altura"></span>
+                    <span class="ia-barra-etiqueta">{{ barra.etiqueta }}</span>
+                  </div>
+                }
+              </div>
+              <figcaption>Vendidas por semana · <b>prevista</b></figcaption>
+            </figure>
+
+            <p class="ia-explicacion">{{ prediccion.explicacion }}</p>
+          </li>
+        } @empty {
+          <li class="ia-vacio">El servicio no devolvió productos con ventas suficientes para predecir.</li>
+        }
+      </ol>
+
+      @if (estado.sinDatosSuficientes.length) {
+        <p class="ia-sin-datos">
+          <strong>Sin predicción todavía:</strong> {{ estado.sinDatosSuficientes.join(', ') }}.
+          {{ plural(estado.sinDatosSuficientes.length, 'Necesita', 'Necesitan') }} al menos 4 semanas completas de ventas.
+        </p>
+      }
+    }
+  } @else if (!ia.error()) {
+    <p class="ia-cargando" role="status">Consultando al servicio inteligente…</p>
+  }
+</section>

@@ -13,11 +13,10 @@ Idea general
 """
 from __future__ import annotations
 
-import csv
 import math
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
-from pathlib import Path
+from datetime import date, timedelta
 from statistics import median
 
 # Semanas de historial que recibe la red para predecir la siguiente
@@ -27,16 +26,14 @@ VENTANA = 4
 ENTRADAS = VENTANA + VENTANA + 1
 # Si un producto no tiene datos de compras, se supone que el proveedor tarda esto
 DIAS_ENTREGA_POR_DEFECTO = 7
+# Semanas completas que necesita cada producto para entrenar: VENTANA para la entrada
+# + al menos 4 para aprender y evaluar
+SEMANAS_MINIMAS = VENTANA + 4
 
 
 # ----------------------------------------------------------------------------
-# Lectura de los CSV
+# Datos de entrada (vienen de SQL Server, ver fuente_sql.py)
 # ----------------------------------------------------------------------------
-
-def _fecha(valor: str) -> date:
-    """Acepta '2026-11-18' o '2026-11-18 14:30:00'."""
-    return datetime.fromisoformat(valor.strip()).date()
-
 
 @dataclass
 class Producto:
@@ -45,34 +42,27 @@ class Producto:
     ventas: dict[date, float] = field(default_factory=dict)  # día -> unidades
 
 
-def leer_ventas(ruta: Path) -> dict[str, Producto]:
+def ventas_desde_filas(filas: Iterable[tuple[date, str, str, float]]) -> dict[str, Producto]:
     """
-    ventas.csv: una fila por cada producto vendido.
-        fecha,codigo,producto,cantidad
-        2026-11-03,ABA-001,Arroz Diana 500 g,2
+    Una fila por producto y día: (fecha, codigo, nombre, cantidad).
+    Si llegan varias filas del mismo producto y día, se suman.
     """
     productos: dict[str, Producto] = {}
-    with open(ruta, encoding="utf-8-sig", newline="") as archivo:
-        for numero, fila in enumerate(csv.DictReader(archivo), start=2):
-            try:
-                codigo = fila["codigo"].strip()
-                dia = _fecha(fila["fecha"])
-                cantidad = float(fila["cantidad"])
-            except (KeyError, ValueError) as error:
-                raise ValueError(f"{ruta.name}, línea {numero}: fila inválida ({error})") from error
-            if cantidad < 0:
-                raise ValueError(f"{ruta.name}, línea {numero}: la cantidad no puede ser negativa")
-            producto = productos.setdefault(codigo, Producto(codigo, fila.get("producto", codigo).strip()))
-            producto.ventas[dia] = producto.ventas.get(dia, 0.0) + cantidad
+    for dia, codigo, nombre, cantidad in filas:
+        cantidad = float(cantidad)
+        if cantidad < 0:
+            raise ValueError(f"{codigo} el {dia}: la cantidad vendida no puede ser negativa")
+        producto = productos.setdefault(codigo, Producto(codigo, nombre))
+        producto.ventas[dia] = producto.ventas.get(dia, 0.0) + cantidad
     return productos
 
 
-def leer_compras(ruta: Path) -> tuple[dict[str, int], dict[str, float]]:
+def compras_desde_filas(
+    filas: Iterable[tuple[str, date, date | None, float]],
+) -> tuple[dict[str, int], dict[str, float]]:
     """
-    compras.csv: una fila por cada producto comprado.
-        fecha_factura,fecha_recepcion,codigo,cantidad
-        2026-11-03,2026-11-05,ABA-001,48
-    fecha_recepcion vacía = la mercancía todavía no llega (está "en camino").
+    Una fila por producto comprado: (codigo, fecha_factura, fecha_recepcion, cantidad).
+    fecha_recepcion None = la mercancía todavía no llega (está "en camino").
 
     Devuelve:
       - días de entrega por producto (mediana de fecha_recepcion - fecha_factura)
@@ -80,41 +70,12 @@ def leer_compras(ruta: Path) -> tuple[dict[str, int], dict[str, float]]:
     """
     demoras: dict[str, list[int]] = {}
     en_camino: dict[str, float] = {}
-    if not ruta.exists():
-        return {}, {}
-    with open(ruta, encoding="utf-8-sig", newline="") as archivo:
-        for numero, fila in enumerate(csv.DictReader(archivo), start=2):
-            try:
-                codigo = fila["codigo"].strip()
-                factura = _fecha(fila["fecha_factura"])
-                recepcion = (fila.get("fecha_recepcion") or "").strip()
-                cantidad = float(fila["cantidad"])
-            except (KeyError, ValueError) as error:
-                raise ValueError(f"{ruta.name}, línea {numero}: fila inválida ({error})") from error
-            if recepcion:
-                demoras.setdefault(codigo, []).append(max(0, (_fecha(recepcion) - factura).days))
-            else:
-                en_camino[codigo] = en_camino.get(codigo, 0.0) + cantidad
+    for codigo, factura, recepcion, cantidad in filas:
+        if recepcion is not None:
+            demoras.setdefault(codigo, []).append(max(0, (recepcion - factura).days))
+        else:
+            en_camino[codigo] = en_camino.get(codigo, 0.0) + float(cantidad)
     return {codigo: round(median(dias)) for codigo, dias in demoras.items()}, en_camino
-
-
-def leer_productos(ruta: Path) -> dict[str, dict]:
-    """
-    productos.csv: el estado actual del inventario.
-        codigo,nombre,existencias,stock_minimo
-        ABA-001,Arroz Diana 500 g,86,30
-    """
-    if not ruta.exists():
-        return {}
-    with open(ruta, encoding="utf-8-sig", newline="") as archivo:
-        return {
-            fila["codigo"].strip(): {
-                "nombre": fila["nombre"].strip(),
-                "existencias": float(fila["existencias"]),
-                "stock_minimo": float(fila.get("stock_minimo") or 0),
-            }
-            for fila in csv.DictReader(archivo)
-        }
 
 
 # ----------------------------------------------------------------------------
@@ -150,22 +111,62 @@ class Serie:
         return len(self.valores)
 
 
+def primera_semana_completa(productos: dict[str, Producto]) -> date:
+    """Lunes de la primera semana que el registro de ventas cubre entera."""
+    dias = [dia for producto in productos.values() for dia in producto.ventas]
+    if not dias:
+        return date.min
+    inicio = min(dias)
+    return inicio if inicio.weekday() == 0 else lunes_de(inicio) + timedelta(days=7)
+
+
+def ultima_semana_completa(productos: dict[str, Producto], hoy: date | None = None) -> date:
+    """
+    Lunes de la última semana terminada que el registro cubre entera. Si después de cierto
+    día no hay ninguna venta registrada, esas semanas no se toman como "se vendió 0": faltan datos.
+    """
+    ultima = lunes_de(hoy or date.today()) - timedelta(days=7)
+    dias = [dia for producto in productos.values() for dia in producto.ventas]
+    if dias:
+        ultima = min(ultima, lunes_de(max(dias) + timedelta(days=1)) - timedelta(days=7))
+    return ultima
+
+
+def semanas_completas(productos: dict[str, Producto], hoy: date | None = None) -> int:
+    """Cuántas semanas completas (lunes a domingo) cubre el registro de ventas."""
+    primera = primera_semana_completa(productos)
+    if primera == date.min:
+        return 0
+    return max(0, (ultima_semana_completa(productos, hoy) - primera).days // 7 + 1)
+
+
+def fecha_para_entrenar(productos: dict[str, Producto], hoy: date | None = None) -> date:
+    """Lunes en que habrá SEMANAS_MINIMAS completas, si se registran ventas todos los días desde hoy."""
+    hoy = hoy or date.today()
+    faltan = max(0, SEMANAS_MINIMAS - semanas_completas(productos, hoy))
+    return lunes_de(hoy) + timedelta(days=7 * faltan) if faltan else hoy
+
+
 def series_semanales(productos: dict[str, Producto], hoy: date | None = None) -> dict[str, Serie]:
     """
     Unidades vendidas por semana (lunes a domingo) de cada producto.
 
     - Solo semanas COMPLETAS: la semana en curso se deja por fuera porque sus
-      ventas todavía no terminan y la red aprendería que "se vende poco".
+      ventas todavía no terminan y la red aprendería que "se vende poco". Tampoco
+      cuentan las semanas posteriores a la última venta registrada (faltan datos).
     - Las semanas sin ventas cuentan como 0 (si no, la serie saltaría semanas).
     - Cada serie empieza en la primera semana con ventas de ese producto.
+    - La primera semana del REGISTRO también se descarta si no empieza en lunes: si el
+      historial arranca un jueves, esa semana solo tiene 4 días y parecería una caída.
     """
-    ultima_completa = lunes_de(hoy or date.today()) - timedelta(days=7)
+    ultima_completa = ultima_semana_completa(productos, hoy)
+    primera_completa = primera_semana_completa(productos)
     series: dict[str, Serie] = {}
     for codigo, producto in productos.items():
         por_semana: dict[date, float] = {}
         for dia, cantidad in producto.ventas.items():
             semana = lunes_de(dia)
-            if semana <= ultima_completa:
+            if primera_completa <= semana <= ultima_completa:
                 por_semana[semana] = por_semana.get(semana, 0.0) + cantidad
         if not por_semana:
             continue

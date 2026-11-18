@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import {
@@ -8,6 +8,7 @@ import {
 } from './modelos';
 import { API_URL } from './api';
 import { mensajeDe, pesos, plural } from './formato';
+import { PrediccionesIa } from './predicciones-ia';
 
 interface DatosIniciales {
   granero: Granero;
@@ -17,6 +18,7 @@ interface DatosIniciales {
   ventas: Array<Omit<Venta, 'hora'> & { hora: string }>;
   compras: Array<Omit<Compra, 'fecha'> & { fecha: string }>;
   abonos: Array<Omit<Abono, 'fecha'> & { fecha: string }>;
+  historialDesde: string;
 }
 
 export function estadoStock(producto: Producto): EstadoStock {
@@ -29,6 +31,7 @@ export function estadoStock(producto: Producto): EstadoStock {
 @Injectable({ providedIn: 'root' })
 export class DatosGranero {
   private readonly http = inject(HttpClient);
+  private readonly ia = inject(PrediccionesIa);
 
   readonly granero = signal<Granero>({ nombre: '', direccion: '', apertura: '', cierre: '' });
   readonly productos = signal<Producto[]>([]);
@@ -37,6 +40,8 @@ export class DatosGranero {
   readonly ventas = signal<Venta[]>([]);
   readonly compras = signal<Compra[]>([]);
   readonly abonos = signal<Abono[]>([]);
+  /** Primer día de `ventas` y `abonos`: la API solo envía el periodo reciente. */
+  readonly historialDesde = signal<Date | null>(null);
   readonly cargando = signal(true);
   readonly errorConexion = signal('');
 
@@ -104,19 +109,10 @@ export class DatosGranero {
     .filter((producto) => ['Stock bajo', 'Agotado'].includes(estadoStock(producto)))
     .sort((a, b) => a.existencias / Math.max(a.minimo, 1) - b.existencias / Math.max(b.minimo, 1)));
 
-  readonly saldos = computed(() => {
-    const saldos = new Map<number, number>();
-    for (const cliente of this.clientes()) saldos.set(cliente.id, cliente.saldoInicial);
-    for (const venta of this.ventas()) {
-      if (venta.pago === 'Fiado' && venta.clienteId !== null) {
-        saldos.set(venta.clienteId, (saldos.get(venta.clienteId) ?? 0) + venta.total);
-      }
-    }
-    for (const abono of this.abonos()) {
-      saldos.set(abono.clienteId, (saldos.get(abono.clienteId) ?? 0) - abono.monto);
-    }
-    return saldos;
-  });
+  // El saldo es el que calcula la API. No se recalcula aquí: `ventas` y `abonos` solo
+  // traen el periodo reciente y no alcanzan para sumar toda la deuda.
+  readonly saldos = computed(() =>
+    new Map(this.clientes().map((cliente) => [cliente.id, cliente.saldo] as const)));
 
   saldoDe(clienteId: number): number {
     return this.saldos().get(clienteId) ?? 0;
@@ -143,6 +139,36 @@ export class DatosGranero {
 
   readonly senales = computed<Senal[]>(() => {
     const senales: Senal[] = [];
+
+    // Primero lo que dice la IA: mira la demanda prevista y los días de entrega, no solo el mínimo
+    const comprarHoy = this.ia.comprarHoy();
+    const estaSemana = this.ia.estaSemana();
+    if (comprarHoy.length) {
+      const primero = comprarHoy[0];
+      const otros = comprarHoy.length - 1;
+      senales.push({
+        clave: 'ia',
+        rotulo: 'Predicción de compra',
+        titulo: `Toca pedir ${primero.producto} hoy.`,
+        detalle: `Se esperan unas ${Math.round(primero.demandaSemanalPrevista)} unidades esta semana y `
+          + (primero.existencias <= 0 ? 'ya está agotado. ' : `quedan ${primero.existencias}. `)
+          + `Sugerencia: ${primero.cantidadSugerida} unidades.`
+          + (otros ? ` Hay ${otros} ${plural(otros, 'producto más', 'productos más')} para pedir hoy.` : ''),
+        ruta: '/inteligencia',
+        fragmento: 'predicciones',
+        enlace: 'Ver predicciones',
+      });
+    } else if (estaSemana.length) {
+      senales.push({
+        clave: 'ia',
+        rotulo: 'Predicción de compra',
+        titulo: `Esta semana toca pedir ${estaSemana.length} ${plural(estaSemana.length, 'producto', 'productos')}.`,
+        detalle: `El primero es ${estaSemana[0].producto}: pídelo ${estaSemana[0].cuando}.`,
+        ruta: '/inteligencia',
+        fragmento: 'predicciones',
+        enlace: 'Ver predicciones',
+      });
+    }
     const bajos = this.productosBajos();
     if (bajos.length) {
       const primero = bajos[0];
@@ -222,6 +248,7 @@ export class DatosGranero {
       this.ventas.set(datos.ventas.map((venta) => ({ ...venta, hora: new Date(venta.hora) })));
       this.compras.set(datos.compras.map((compra) => ({ ...compra, fecha: this.parseFechaCompra(compra.fecha) })));
       this.abonos.set(datos.abonos.map((abono) => ({ ...abono, fecha: new Date(abono.fecha) })));
+      this.historialDesde.set(this.parseFechaCompra(datos.historialDesde));
     } catch (error) {
       this.errorConexion.set(mensajeDe(error));
     } finally {
@@ -242,6 +269,11 @@ export class DatosGranero {
           : producto,
       ));
     }
+    if (venta.pago === 'Fiado' && venta.clienteId !== null) {
+      this.ajustarSaldo(venta.clienteId, venta.total);
+    }
+    // Las existencias cambiaron: la IA vuelve a calcular cuándo y cuánto comprar
+    void this.ia.cargar(true);
     return venta;
   }
 
@@ -272,6 +304,8 @@ export class DatosGranero {
     if (compra.estado !== 'En camino' && compra.productoId && compra.cantidad) {
       this.sumarExistencias(compra.productoId, compra.cantidad);
     }
+    // Una compra en camino o recibida cambia lo disponible para la IA
+    void this.ia.cargar(true);
     return compra;
   }
 
@@ -284,6 +318,7 @@ export class DatosGranero {
     this.compras.update((compras) => compras.map((item) =>
       item.id === id ? { ...item, estado } : item,
     ));
+    void this.ia.cargar(true);
   }
 
   async registrarCliente(datos: NuevoCliente): Promise<Cliente> {
@@ -315,8 +350,16 @@ export class DatosGranero {
       this.http.post<Omit<Abono, 'fecha'> & { fecha: string }>(`${API_URL}/payments`, { clienteId, monto }),
     );
     const abono = { ...respuesta, fecha: new Date(respuesta.fecha) };
-    this.abonos.update((abonos) => [...abonos, abono]);
+    this.abonos.update((abonos) => [abono, ...abonos]);
+    this.ajustarSaldo(abono.clienteId, -abono.monto);
     return abono;
+  }
+
+  /** Refleja en pantalla un fiado o abono que la API ya aceptó, sin volver a cargar todo. */
+  private ajustarSaldo(clienteId: number, cambio: number): void {
+    this.clientes.update((clientes) => clientes.map((cliente) =>
+      cliente.id === clienteId ? { ...cliente, saldo: cliente.saldo + cambio } : cliente,
+    ));
   }
 
   async guardarGranero(datos: Granero): Promise<void> {
@@ -328,6 +371,12 @@ export class DatosGranero {
     try {
       return await firstValueFrom(request);
     } catch (error) {
+      // Otra caja cambió el inventario mientras tanto: lo que se ve en pantalla ya no es
+      // real, así que se vuelve a cargar para que el siguiente intento parta de datos frescos.
+      if (error instanceof HttpErrorResponse && error.status === 409
+          && error.error?.codigo === 'conflicto-concurrencia') {
+        void this.cargar();
+      }
       throw new Error(mensajeDe(error));
     }
   }

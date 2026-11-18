@@ -34,4 +34,6 @@ public sealed record DatosInicialesDto(
     IReadOnlyList<ProveedorDto> Proveedores,
     IReadOnlyList<VentaDto> Ventas,
     IReadOnlyList<CompraDto> Compras,
-    IReadOnlyList<AbonoDto> Abonos);
+    IReadOnlyList<AbonoDto> Abonos,
+    // Desde qué día vienen Ventas y Abonos; lo anterior se pide con GET /api/sales?desde=
+    DateOnly HistorialDesde);

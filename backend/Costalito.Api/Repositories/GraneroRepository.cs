@@ -19,18 +19,29 @@ public sealed class GraneroRepository(CostalitoDbContext db) : IGraneroRepositor
         db.Proveedores.AsNoTracking().Where(proveedor => proveedor.Activo)
             .OrderBy(proveedor => proveedor.Nombre).ToListAsync(cancellationToken);
 
-    public Task<List<Venta>> ObtenerVentasAsync(CancellationToken cancellationToken) =>
-        db.Ventas.AsNoTracking().Include(venta => venta.Cliente)
+    public Task<List<Venta>> ObtenerVentasAsync(
+        DateTime? desde, DateTime? hastaSin, CancellationToken cancellationToken) =>
+        db.Ventas.AsNoTracking()
+            .Where(venta => (desde == null || venta.FechaHora >= desde)
+                && (hastaSin == null || venta.FechaHora < hastaSin))
+            .Include(venta => venta.Cliente)
             .Include(venta => venta.Detalles).ThenInclude(detalle => detalle.Producto)
-            .OrderByDescending(venta => venta.FechaHora).ToListAsync(cancellationToken);
+            .OrderByDescending(venta => venta.FechaHora)
+            // Una venta trae varias líneas: consultas separadas evitan repetir la venta por cada línea
+            .AsSplitQuery()
+            .ToListAsync(cancellationToken);
 
     public Task<List<Compra>> ObtenerComprasAsync(CancellationToken cancellationToken) =>
         db.Compras.AsNoTracking().Include(compra => compra.Detalles)
             .ThenInclude(detalle => detalle.Producto)
             .OrderByDescending(compra => compra.FechaFactura).ToListAsync(cancellationToken);
 
-    public Task<List<AbonoCliente>> ObtenerAbonosClientesAsync(CancellationToken cancellationToken) =>
-        db.AbonosClientes.AsNoTracking().OrderByDescending(abono => abono.FechaHora)
+    public Task<List<AbonoCliente>> ObtenerAbonosClientesAsync(
+        DateTime? desde, DateTime? hastaSin, CancellationToken cancellationToken) =>
+        db.AbonosClientes.AsNoTracking()
+            .Where(abono => (desde == null || abono.FechaHora >= desde)
+                && (hastaSin == null || abono.FechaHora < hastaSin))
+            .OrderByDescending(abono => abono.FechaHora)
             .ToListAsync(cancellationToken);
 
     public Task<ConfiguracionNegocio?> ObtenerConfiguracionAsync(CancellationToken cancellationToken) =>
@@ -129,4 +140,6 @@ public sealed class GraneroRepository(CostalitoDbContext db) : IGraneroRepositor
 
     public Task GuardarCambiosAsync(CancellationToken cancellationToken) =>
         db.SaveChangesAsync(cancellationToken);
+
+    public void DescartarCambios() => db.ChangeTracker.Clear();
 }

@@ -1,0 +1,67 @@
+/* Predicciones del servicio inteligente: una libreta de pedidos. Cada renglón es un
+   producto con su sello de urgencia, la acción, las barras de las ventas y el porqué. */
+:host { display: block; }
+.ia { margin-top: 34px; scroll-margin-top: 20px; }
+.ia-cabecera { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 14px; padding-bottom: 14px; border-bottom: 2px solid var(--tinta); }
+.ia-cabecera h3 { margin: 4px 0 0; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+.ia-acciones { display: flex; align-items: center; gap: 14px; }
+.ia-hora { color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.82rem; }
+
+.ia-aviso { margin-top: 16px; padding: 18px 22px; background: var(--papel); border: 1px solid var(--trazo); border-left: 6px solid var(--arcilla); }
+.ia-aviso strong { font-family: var(--fuente-titulo); font-size: 1.15rem; }
+.ia-aviso p { margin: 6px 0 0; color: var(--gris-suave); }
+.ia-aviso .ia-aviso-nota { font-size: 0.92rem; }
+.ia-cargando { margin: 18px 0; color: var(--gris-suave); font-family: var(--fuente-ticket); }
+
+/* Resumen como tirilla: tres conteos y el método */
+.ia-resumen { display: grid; grid-template-columns: repeat(3, minmax(110px, 0.5fr)) minmax(240px, 1.5fr); margin: 18px 0 0; background: var(--papel); border: 1px solid var(--trazo); box-shadow: var(--sombra-papel); }
+.ia-resumen-celda { margin: 0; padding: 14px 18px; border-right: 1px dashed var(--trazo); border-top: 4px solid var(--trazo); }
+.ia-resumen-celda:last-child { border-right: 0; }
+.ia-resumen dt { color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.ia-resumen dd { margin: 2px 0 0; font-family: var(--fuente-ticket); font-size: 2.1rem; font-weight: 700; line-height: 1.1; }
+.ia-resumen-celda--hoy { border-top-color: var(--arcilla); }
+.ia-resumen-celda--hoy dd { color: var(--arcilla-oscura); }
+.ia-resumen-celda--semana { border-top-color: var(--mostaza); }
+.ia-resumen-celda--semana dd { color: #85600a; }
+.ia-resumen-celda--bien { border-top-color: var(--verde-monte); }
+.ia-resumen-celda--bien dd { color: var(--verde-monte); }
+.ia-resumen-metodo { border-top-color: var(--verde-hondo); }
+.ia-resumen-metodo dd { font-family: var(--fuente-titulo); font-size: 1.3rem; }
+.ia-resumen .ia-resumen-nota { margin-top: 4px; color: var(--gris-suave); font-family: var(--fuente-texto); font-size: 0.9rem; font-weight: 400; line-height: 1.4; }
+
+/* Lista de productos */
+.ia-lista { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.ia-item { display: grid; grid-template-columns: minmax(190px, 1fr) minmax(220px, 1.25fr) 230px; gap: 8px 24px; align-items: center; padding: 16px 20px; background: var(--papel); border: 1px solid var(--trazo); border-left: 6px solid var(--trazo); }
+.ia-item--agotado { border-left-color: var(--arcilla-oscura); background: linear-gradient(90deg, #fbeee9, var(--papel) 30%); }
+.ia-item--alta { border-left-color: var(--arcilla); }
+.ia-item--media { border-left-color: var(--mostaza); }
+.ia-item--baja { border-left-color: var(--verde-monte); }
+.ia-item--quieto { border-left-color: var(--gris-suave); }
+.ia-producto h4 { margin: 8px 0 0; font-size: 1.25rem; }
+.ia-codigo { color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.8rem; }
+.ia-decision strong { display: block; font-family: var(--fuente-titulo); font-size: 1.2rem; line-height: 1.25; }
+.ia-item--agotado .ia-decision strong, .ia-item--alta .ia-decision strong { color: var(--arcilla-oscura); }
+.ia-decision span { display: block; margin-top: 4px; color: var(--gris-suave); font-size: 0.9rem; line-height: 1.4; }
+.ia-explicacion { grid-column: 1 / -1; margin: 4px 0 0; padding-top: 10px; color: var(--gris-suave); border-top: 1px dashed var(--trazo); font-size: 0.92rem; line-height: 1.45; }
+
+/* Barras: 4 semanas vendidas (verde) y la prevista (mostaza con rayas) */
+.ia-grafica { margin: 0; }
+.ia-barras { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-items: end; height: 92px; }
+.ia-barra { display: grid; grid-template-rows: auto 1fr auto; height: 100%; text-align: center; }
+.ia-barra-valor { color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.72rem; line-height: 1.2; }
+.ia-barra-relleno { align-self: end; width: 100%; min-height: 3px; background: #8fae9c; border-top: 2px solid var(--verde-monte); transition: height 0.25s ease; }
+.ia-barra-etiqueta { padding-top: 3px; color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.68rem; white-space: nowrap; border-top: 1px solid var(--tinta); }
+.ia-barra--prevista .ia-barra-relleno { background: repeating-linear-gradient(-45deg, var(--mostaza), var(--mostaza) 4px, #f3df9c 4px, #f3df9c 8px); border-top-color: #85600a; }
+.ia-barra--prevista .ia-barra-valor, .ia-barra--prevista .ia-barra-etiqueta { color: #85600a; font-weight: 700; }
+.ia-grafica figcaption { margin-top: 4px; color: var(--gris-suave); font-size: 0.74rem; text-align: right; }
+.ia-grafica figcaption b { color: #85600a; }
+
+.ia-vacio, .ia-sin-datos { padding: 14px 18px; color: var(--gris-suave); background: var(--papel); border: 1px dashed var(--trazo); }
+.ia-sin-datos { margin: 10px 0 0; font-size: 0.92rem; }
+.ia-sin-datos strong { color: var(--tinta); }
+
+@media (prefers-reduced-motion: reduce) { .ia-barra-relleno { transition: none; } }
+@media (max-width: 1100px) { .ia-item { grid-template-columns: minmax(0, 1fr) 210px; }.ia-decision { grid-column: 1; grid-row: 2; }.ia-grafica { grid-column: 2; grid-row: 1 / span 2; } }
+@media (max-width: 760px) { .ia-resumen { grid-template-columns: repeat(3, 1fr); }.ia-resumen-metodo { grid-column: 1 / -1; border-top: 1px dashed var(--trazo); border-right: 0; }.ia-item { grid-template-columns: 1fr; }.ia-decision, .ia-grafica { grid-column: 1; grid-row: auto; }.ia-grafica { max-width: 320px; } }
+@media (max-width: 420px) { .ia-resumen-celda { padding: 12px; }.ia-resumen dd { font-size: 1.7rem; }.ia-acciones { width: 100%; justify-content: space-between; } }
+

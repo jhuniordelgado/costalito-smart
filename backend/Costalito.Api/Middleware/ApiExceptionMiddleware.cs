@@ -8,6 +8,9 @@ public sealed class ApiExceptionMiddleware(
     RequestDelegate next,
     ILogger<ApiExceptionMiddleware> logger)
 {
+    /// <summary>Angular lo reconoce para recargar los datos que quedaron desactualizados.</summary>
+    public const string CodigoConflictoConcurrencia = "conflicto-concurrencia";
+
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -18,10 +21,27 @@ public sealed class ApiExceptionMiddleware(
         {
             await EscribirErrorAsync(context, error.StatusCode, error.Message);
         }
+        catch (DbUpdateConcurrencyException error)
+        {
+            // Va antes que DbUpdateException porque hereda de ella.
+            logger.LogWarning(error, "Conflicto de concurrencia al guardar en {Path}.", context.Request.Path);
+            await EscribirErrorAsync(
+                context, StatusCodes.Status409Conflict,
+                "Otra persona cambió estos datos al mismo tiempo. Revisa las existencias o el saldo e intenta de nuevo.",
+                DetalleEnDesarrollo(context, error), CodigoConflictoConcurrencia);
+        }
         catch (DbUpdateException error)
         {
             var detalle = DetalleEnDesarrollo(context, error);
-            if (ContieneErrorSql(error))
+            var errorSql = BuscarErrorSql(error);
+            if (errorSql is not null && TraduccionErroresSql.Traducir(errorSql) is { } traducido)
+            {
+                // La base rechazó los datos (repetidos, fuera de regla): es un error del
+                // pedido, no del servidor.
+                logger.LogWarning(error, "SQL Server rechazó los datos: {Mensaje}", traducido.Mensaje);
+                await EscribirErrorAsync(context, traducido.Status, traducido.Mensaje, detalle);
+            }
+            else if (errorSql is not null)
             {
                 logger.LogError(error, "No fue posible completar la operación en SQL Server.");
                 await EscribirErrorAsync(
@@ -35,6 +55,11 @@ public sealed class ApiExceptionMiddleware(
                     context, StatusCodes.Status409Conflict,
                     "No se pudo guardar el registro. Revisa los datos e intenta de nuevo.", detalle);
             }
+        }
+        catch (SqlException error) when (TraduccionErroresSql.Traducir(error) is { } traducido)
+        {
+            logger.LogWarning(error, "SQL Server rechazó los datos: {Mensaje}", traducido.Mensaje);
+            await EscribirErrorAsync(context, traducido.Status, traducido.Mensaje, DetalleEnDesarrollo(context, error));
         }
         catch (SqlException error)
         {
@@ -56,14 +81,14 @@ public sealed class ApiExceptionMiddleware(
         }
     }
 
-    private static bool ContieneErrorSql(Exception error)
+    private static SqlException? BuscarErrorSql(Exception error)
     {
         for (var actual = error; actual is not null; actual = actual.InnerException)
         {
-            if (actual is SqlException)
-                return true;
+            if (actual is SqlException sql)
+                return sql;
         }
-        return false;
+        return null;
     }
 
     private static string? DetalleEnDesarrollo(HttpContext context, Exception error) =>
@@ -72,7 +97,7 @@ public sealed class ApiExceptionMiddleware(
             : null;
 
     private static async Task EscribirErrorAsync(
-        HttpContext context, int status, string message, string? detalle = null)
+        HttpContext context, int status, string message, string? detalle = null, string? codigo = null)
     {
         if (context.Response.HasStarted)
             return;
@@ -86,6 +111,8 @@ public sealed class ApiExceptionMiddleware(
             ["status"] = status,
             ["traceId"] = context.TraceIdentifier,
         };
+        if (codigo is not null)
+            respuesta["codigo"] = codigo;
         if (detalle is not null)
             respuesta["detalle"] = detalle;
 

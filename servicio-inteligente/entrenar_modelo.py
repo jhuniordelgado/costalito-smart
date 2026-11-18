@@ -2,32 +2,34 @@
 Entrena la red neuronal que predice las ventas de la próxima semana de cada producto.
 
     python entrenar_modelo.py
+    python entrenar_modelo.py --revisar     # solo dice si ya hay datos suficientes
 
-Lee datos/ventas.csv (y datos/compras.csv si existe) y guarda:
+Lee las ventas y compras de la base CostalitoSmart de SQL Server (ver fuente_sql.py) y guarda:
   - modelo_demanda.keras   : la red entrenada
   - modelo_metadata.json   : métricas, fecha, productos y días de entrega
 
 Basado en el entrenar_modelo.py de la guía (ver tutorial_original/). Cambios:
-  * Datos de ventas reales/simulados en vez de 20 filas escritas a mano.
+  * Ventas registradas en la base del granero en vez de 20 filas escritas a mano.
   * La salida es una CANTIDAD (regresión): última capa sin sigmoide, pérdida Huber.
   * Datos separados en entrenamiento / validación / prueba POR TIEMPO.
   * Se compara contra una línea base (promedio de las últimas 4 semanas).
 """
 import argparse
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import numpy as np
-import tensorflow as tf
 
-from demanda import ENTRADAS, VENTANA, crear_ejemplos, leer_compras, leer_ventas, promedio_movil, series_semanales
+from demanda import (
+    ENTRADAS, SEMANAS_MINIMAS, VENTANA, crear_ejemplos, fecha_para_entrenar, primera_semana_completa, promedio_movil, semanas_completas,
+    series_semanales,
+)
+from fuente_sql import leer_datos
 
 CARPETA = Path(__file__).parent
 RUTA_MODELO = CARPETA / "modelo_demanda.keras"
 RUTA_METADATA = CARPETA / "modelo_metadata.json"
-# Semanas mínimas por producto: VENTANA para la entrada + al menos 4 para aprender y evaluar
-SEMANAS_MINIMAS = VENTANA + 4
 
 
 def separar_por_tiempo(ejemplos: list) -> tuple[list, list, list]:
@@ -50,7 +52,8 @@ def a_matrices(ejemplos: list) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return x, y, escalas
 
 
-def crear_modelo() -> tf.keras.Model:
+def crear_modelo():
+    import tensorflow as tf
     # La misma red pequeña de la guía (8 -> 4 -> 1); solo cambian la entrada y la salida
     modelo = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(ENTRADAS,)),
@@ -67,19 +70,44 @@ def crear_modelo() -> tf.keras.Model:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Entrena el modelo de demanda semanal.")
-    parser.add_argument("--datos", type=Path, default=CARPETA / "datos", help="carpeta con ventas.csv y compras.csv")
     parser.add_argument("--epocas", type=int, default=300)
     parser.add_argument("--hoy", type=date.fromisoformat, default=None,
                         help="fecha de corte AAAA-MM-DD (por defecto hoy); solo se usan semanas completas anteriores")
+    parser.add_argument("--revisar", action="store_true",
+                        help="solo revisa si la base ya tiene semanas suficientes, sin entrenar")
     args = parser.parse_args()
+    hoy = args.hoy or date.today()
 
-    ruta_ventas = args.datos / "ventas.csv"
-    if not ruta_ventas.exists():
-        raise SystemExit(f"No se encontró {ruta_ventas}. Ejecuta 'python generar_datos_demo.py' o copia tus ventas ahí.")
+    try:
+        datos = leer_datos(hasta=hoy - timedelta(days=1))
+    except RuntimeError as error:
+        raise SystemExit(str(error)) from error
+    productos, dias_entrega = datos.productos, datos.dias_entrega
+    if not productos:
+        raise SystemExit("La base no tiene ventas registradas todavía.")
 
-    productos = leer_ventas(ruta_ventas)
-    series = series_semanales(productos, args.hoy)
-    dias_entrega, _ = leer_compras(args.datos / "compras.csv")
+    # 0. ¿Alcanzan las semanas? Se revisa antes de cargar TensorFlow
+    semanas = semanas_completas(productos, hoy)
+    primera = primera_semana_completa(productos)
+    disponible_desde = fecha_para_entrenar(productos, hoy)
+    print(f"Ventas en la base desde el {min(d for p in productos.values() for d in p.ventas):%d/%m/%Y}: "
+          f"{semanas} semanas completas (desde el lunes {primera:%d/%m/%Y}); se necesitan {SEMANAS_MINIMAS}.")
+    if semanas < SEMANAS_MINIMAS:
+        raise SystemExit(
+            f"Todavía no hay datos suficientes para entrenar la red. Se podrá desde el lunes "
+            f"{disponible_desde:%d/%m/%Y}, si se siguen registrando ventas.\n"
+            "Mientras tanto la API predice con el promedio de las últimas 4 semanas de la base.")
+    if args.revisar:
+        print("Hay datos suficientes: ejecuta 'python entrenar_modelo.py' para entrenar.")
+        return
+
+    try:
+        import tensorflow as tf
+    except ImportError as error:
+        raise SystemExit("TensorFlow no está instalado en este entorno (requiere Python 3.13 o anterior; "
+                         "ver README).") from error
+
+    series = series_semanales(productos, hoy)
 
     # 1. Ventanas por producto, separadas por tiempo
     entrenamiento, validacion, prueba, omitidos = [], [], [], []

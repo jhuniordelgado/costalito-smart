@@ -25,7 +25,7 @@ public static class DatabaseInitializer
             logger,
             cancellationToken);
 
-        foreach (var fileName in new[] { "01_crear_estructura.sql", "02_datos_prueba.sql" })
+        foreach (var fileName in new[] { "01_crear_estructura.sql", "02_datos_prueba.sql", "03_historial_ventas_compras.sql" })
         {
             var path = Path.Combine(scriptsDirectory, fileName);
             var script = await File.ReadAllTextAsync(path, cancellationToken);

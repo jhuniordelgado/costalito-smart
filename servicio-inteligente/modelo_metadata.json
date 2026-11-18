@@ -1,6 +1,6 @@
 {
-  "version": "20261118-082222",
-  "entrenado": "2026-11-18T08:22:22",
+  "version": "20261118-140836",
+  "entrenado": "2026-11-18T14:08:36",
   "ventana_semanas": 4,
   "entradas": [
     "ventas normalizadas x4",
@@ -8,30 +8,33 @@
     "quincena en la semana a predecir"
   ],
   "productos_usados": 14,
-  "productos_omitidos": [],
+  "productos_omitidos": [
+    "Chocoramo (1 semanas)"
+  ],
   "ejemplos": {
-    "entrenamiento": 476,
-    "validacion": 98,
-    "prueba": 98
+    "entrenamiento": 42,
+    "validacion": 14,
+    "prueba": 14
   },
-  "epocas_entrenadas": 69,
-  "mae_red_neuronal": 5.15,
-  "mae_promedio_movil": 5.77,
-  "usar_red": true,
+  "epocas_entrenadas": 55,
+  "mae_red_neuronal": 7.12,
+  "mae_promedio_movil": 6.04,
+  "usar_red": false,
   "dias_entrega": {
-    "ABA-001": 2,
-    "ABA-002": 3,
-    "ABA-003": 2,
-    "ABA-004": 3,
-    "ABA-005": 3,
-    "ABA-006": 4,
     "LAC-001": 1,
-    "LAC-002": 2,
-    "ALI-001": 2,
-    "ALI-002": 1,
-    "BEB-001": 2,
+    "456789": 0,
+    "ASE-002": 4,
     "BEB-002": 2,
-    "ASE-001": 5,
-    "ASE-002": 4
+    "ABA-002": 2,
+    "ASE-001": 4,
+    "BEB-001": 2,
+    "ABA-005": 2,
+    "ALI-001": 3,
+    "ALI-002": 2,
+    "ABA-001": 2,
+    "ABA-006": 3,
+    "ABA-003": 3,
+    "ABA-004": 2,
+    "LAC-002": 1
   }
 }

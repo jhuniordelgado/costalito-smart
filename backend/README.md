@@ -4,7 +4,17 @@ API REST en ASP.NET Core 10 con EF Core y SQL Server. La solución separa contro
 
 ## Configuración local
 
-1. Copia `Costalito.Api/appsettings.Example.json` como `Costalito.Api/appsettings.Development.json` si el archivo local no existe. La conexión de ejemplo usa LocalDB; el archivo local está excluido de Git.
+`Costalito.Api/appsettings.Development.json` no se incluye en Git: cada desarrollador lo crea localmente. Abre PowerShell en la raíz del repositorio (`costalito-smart`) y ejecuta:
+
+1. Crear la configuración local, sin sobrescribir una que ya exista:
+
+```powershell
+if (-not (Test-Path backend/Costalito.Api/appsettings.Development.json)) {
+    Copy-Item backend/Costalito.Api/appsettings.Example.json backend/Costalito.Api/appsettings.Development.json
+}
+```
+
+La cadena del ejemplo usa SQL Server LocalDB. Si tu instalación usa otro servidor, cambia `ConnectionStrings:Costalito` en `appsettings.Development.json`.
 2. Inicia LocalDB:
 
 ```powershell

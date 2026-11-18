@@ -29,7 +29,12 @@ export class Creditos {
   readonly porPagar = computed(() => this.datos.compras()
     .filter((compra) => compra.estado === 'Pendiente de pago')
     .reduce((suma, compra) => suma + compra.total, 0));
-  readonly abonosDelMes = computed(() => this.datos.abonos().reduce((suma, abono) => suma + abono.monto, 0));
+  readonly abonosDelMes = computed(() => {
+    const hoy = new Date();
+    return this.datos.abonos()
+      .filter((abono) => abono.fecha.getFullYear() === hoy.getFullYear() && abono.fecha.getMonth() === hoy.getMonth())
+      .reduce((suma, abono) => suma + abono.monto, 0);
+  });
   readonly saldos = computed<SaldoVisible[]>(() => {
     const clientes = this.datos.clientesConSaldo().map((cliente) => ({
       responsable: cliente.nombre,

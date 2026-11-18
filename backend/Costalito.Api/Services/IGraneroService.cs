@@ -8,9 +8,11 @@ public interface IGraneroService
     Task<IReadOnlyList<ProductoDto>> ObtenerProductosAsync(CancellationToken cancellationToken);
     Task<IReadOnlyList<ClienteDto>> ObtenerClientesAsync(CancellationToken cancellationToken);
     Task<IReadOnlyList<ProveedorDto>> ObtenerProveedoresAsync(CancellationToken cancellationToken);
-    Task<IReadOnlyList<VentaDto>> ObtenerVentasAsync(CancellationToken cancellationToken);
+    /// <summary>Ventas entre dos días, ambos incluidos. Sin fechas, todas.</summary>
+    Task<IReadOnlyList<VentaDto>> ObtenerVentasAsync(DateOnly? desde, DateOnly? hasta, CancellationToken cancellationToken);
     Task<IReadOnlyList<CompraDto>> ObtenerComprasAsync(CancellationToken cancellationToken);
-    Task<IReadOnlyList<AbonoDto>> ObtenerAbonosAsync(CancellationToken cancellationToken);
+    /// <summary>Abonos entre dos días, ambos incluidos. Sin fechas, todos.</summary>
+    Task<IReadOnlyList<AbonoDto>> ObtenerAbonosAsync(DateOnly? desde, DateOnly? hasta, CancellationToken cancellationToken);
     Task<GraneroDto> ObtenerGraneroAsync(CancellationToken cancellationToken);
 
     Task<ProductoDto> RegistrarProductoAsync(CrearProductoDto datos, CancellationToken cancellationToken);

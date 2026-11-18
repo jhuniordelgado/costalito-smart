@@ -50,6 +50,24 @@ builder.Services.AddRateLimiter(options =>
         context.Connection.RemoteIpAddress?.ToString() ?? "desconocido",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1) }));
 });
+builder.Services.AddOptions<OpcionesGranero>()
+    .Bind(builder.Configuration.GetSection(OpcionesGranero.Seccion))
+    .Validate(opciones => opciones.DiasHistorialInicial is >= 1 and <= 3650,
+        "Granero:DiasHistorialInicial debe estar entre 1 y 3650.")
+    .ValidateOnStart();
+builder.Services.AddOptions<OpcionesServicioInteligente>()
+    .Bind(builder.Configuration.GetSection(OpcionesServicioInteligente.Seccion))
+    .Validate(opciones => Uri.TryCreate(opciones.Url, UriKind.Absolute, out _),
+        "ServicioInteligente:Url debe ser una dirección completa, por ejemplo http://127.0.0.1:8000.")
+    .ValidateOnStart();
+builder.Services.AddHttpClient<IServicioInteligente, ServicioInteligente>((proveedor, http) =>
+{
+    var opciones = proveedor.GetRequiredService<Microsoft.Extensions.Options.IOptions<OpcionesServicioInteligente>>().Value;
+    http.BaseAddress = new Uri(opciones.Url);
+    http.Timeout = TimeSpan.FromSeconds(opciones.TiempoEsperaSegundos);
+});
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IRelojGranero, RelojGranero>();
 builder.Services.AddScoped<IGraneroRepository, GraneroRepository>();
 builder.Services.AddScoped<IGraneroService, GraneroService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();

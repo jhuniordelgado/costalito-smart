@@ -32,6 +32,7 @@ public sealed class CostalitoDbContext(DbContextOptions<CostalitoDbContext> opti
             entity.Property(producto => producto.PrecioMayorista).HasPrecision(12, 2);
             entity.Property(producto => producto.Existencias).HasPrecision(12, 3);
             entity.Property(producto => producto.StockMinimo).HasPrecision(12, 3);
+            entity.Property(producto => producto.RowVersion).IsRowVersion();
         });
         modelBuilder.Entity<Cliente>(entity =>
         {
@@ -39,6 +40,7 @@ public sealed class CostalitoDbContext(DbContextOptions<CostalitoDbContext> opti
             entity.HasIndex(cliente => cliente.Cedula).IsUnique().HasFilter("[Cedula] IS NOT NULL");
             entity.Property(cliente => cliente.LimiteFiado).HasPrecision(12, 2);
             entity.Property(cliente => cliente.SaldoInicial).HasPrecision(12, 2);
+            entity.Property(cliente => cliente.RowVersion).IsRowVersion();
         });
         modelBuilder.Entity<Proveedor>().ToTable("Proveedores");
         modelBuilder.Entity<Venta>(entity =>

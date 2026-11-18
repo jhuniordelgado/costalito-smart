@@ -7,9 +7,11 @@ public interface IGraneroRepository
     Task<List<Producto>> ObtenerProductosAsync(CancellationToken cancellationToken);
     Task<List<Cliente>> ObtenerClientesAsync(CancellationToken cancellationToken);
     Task<List<Proveedor>> ObtenerProveedoresAsync(CancellationToken cancellationToken);
-    Task<List<Venta>> ObtenerVentasAsync(CancellationToken cancellationToken);
+    /// <param name="desde">Incluido. Null = sin límite.</param>
+    /// <param name="hastaSin">Excluido (el día siguiente al último que se quiere). Null = sin límite.</param>
+    Task<List<Venta>> ObtenerVentasAsync(DateTime? desde, DateTime? hastaSin, CancellationToken cancellationToken);
     Task<List<Compra>> ObtenerComprasAsync(CancellationToken cancellationToken);
-    Task<List<AbonoCliente>> ObtenerAbonosClientesAsync(CancellationToken cancellationToken);
+    Task<List<AbonoCliente>> ObtenerAbonosClientesAsync(DateTime? desde, DateTime? hastaSin, CancellationToken cancellationToken);
     Task<ConfiguracionNegocio?> ObtenerConfiguracionAsync(CancellationToken cancellationToken);
 
     Task<Producto?> BuscarProductoAsync(int id, CancellationToken cancellationToken);
@@ -31,4 +33,7 @@ public interface IGraneroRepository
     Task GuardarAbonoClienteAsync(AbonoCliente abono, CancellationToken cancellationToken);
     Task GuardarConfiguracionAsync(ConfiguracionNegocio configuracion, CancellationToken cancellationToken);
     Task GuardarCambiosAsync(CancellationToken cancellationToken);
+
+    /// <summary>Olvida las entidades cargadas para volver a leerlas frescas de la base.</summary>
+    void DescartarCambios();
 }

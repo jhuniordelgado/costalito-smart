@@ -12,7 +12,7 @@
         <strong>{{ prioridad.titulo }}</strong>
         <p>{{ prioridad.detalle }}</p>
       </div>
-      <a [routerLink]="prioridad.ruta">{{ prioridad.enlace }}</a>
+      <a [routerLink]="prioridad.ruta" [fragment]="prioridad.fragmento">{{ prioridad.enlace }}</a>
     </li>
     }
   </ul>

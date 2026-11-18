@@ -11,7 +11,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from demanda import (  # noqa: E402
-    ENTRADAS, VENTANA, Producto, crear_ejemplos, recomendar_compra, series_semanales, tiene_quincena,
+    ENTRADAS, SEMANAS_MINIMAS, VENTANA, Producto, compras_desde_filas, crear_ejemplos, fecha_para_entrenar,
+    primera_semana_completa, recomendar_compra, semanas_completas, series_semanales, tiene_quincena,
+    ventas_desde_filas,
 )
 
 HOY = date(2026, 11, 18)  # miércoles; la última semana completa es la del lunes 9 de noviembre
@@ -93,6 +95,58 @@ class RecomendarCompra(unittest.TestCase):
         una = recomendar_compra(70, existencias=0, hoy=HOY)["cantidad_sugerida"]
         dos = recomendar_compra(70, existencias=0, semanas_cobertura=2, hoy=HOY)["cantidad_sugerida"]
         self.assertEqual(dos - una, 70)
+
+
+class DatosDeLaBase(unittest.TestCase):
+    def test_ventas_desde_filas_suma_el_mismo_dia(self):
+        productos = ventas_desde_filas([
+            (date(2026, 10, 1), "A", "Arroz", 2), (date(2026, 10, 1), "A", "Arroz", 3),
+            (date(2026, 10, 2), "L", "Leche", 1),
+        ])
+        self.assertEqual(productos["A"].ventas, {date(2026, 10, 1): 5.0})
+        self.assertEqual(productos["L"].nombre, "Leche")
+
+    def test_cantidad_negativa_es_un_error(self):
+        with self.assertRaises(ValueError):
+            ventas_desde_filas([(date(2026, 10, 1), "A", "Arroz", -1)])
+
+    def test_compras_aprenden_demora_y_lo_que_esta_en_camino(self):
+        dias, en_camino = compras_desde_filas([
+            ("A", date(2026, 10, 1), date(2026, 10, 3), 12),
+            ("A", date(2026, 10, 8), date(2026, 10, 10), 12),
+            ("A", date(2026, 10, 15), date(2026, 10, 19), 12),
+            ("A", date(2026, 11, 16), None, 24),
+        ])
+        self.assertEqual(dias, {"A": 2})          # mediana de 2, 2 y 4 días
+        self.assertEqual(en_camino, {"A": 24.0})
+
+
+class SemanasCompletas(unittest.TestCase):
+    # El historial de la base empieza el jueves 1 de octubre de 2026
+    PRODUCTOS = {"A": Producto("A", "Arroz", {
+        date(2026, 10, 1) + timedelta(days=i): 1 for i in range(48)  # 1 oct .. 17 nov
+    })}
+
+    def test_la_primera_semana_parcial_no_cuenta(self):
+        self.assertEqual(primera_semana_completa(self.PRODUCTOS), date(2026, 10, 5))
+        serie = series_semanales(self.PRODUCTOS, HOY)["A"]
+        self.assertEqual(serie.inicio, date(2026, 10, 5))
+        self.assertEqual(serie.valores, [7] * 6)  # nada de la semana del 28 sep con solo 4 días
+
+    def test_cuenta_semanas_y_cuando_alcanzan(self):
+        self.assertEqual(semanas_completas(self.PRODUCTOS, HOY), 6)
+        self.assertEqual(SEMANAS_MINIMAS, 8)
+        # faltan 2 semanas: con ventas todos los días, el lunes 30 de noviembre
+        self.assertEqual(fecha_para_entrenar(self.PRODUCTOS, HOY), date(2026, 11, 30))
+
+    def test_las_semanas_sin_registro_no_cuentan_como_cero(self):
+        # el 30 de noviembre, sin ventas registradas después del 17, siguen siendo 6 semanas
+        self.assertEqual(semanas_completas(self.PRODUCTOS, date(2026, 11, 30)), 6)
+        self.assertEqual(len(series_semanales(self.PRODUCTOS, date(2026, 11, 30))["A"]), 6)
+
+    def test_si_el_historial_empieza_en_lunes_esa_semana_si_cuenta(self):
+        productos = {"A": Producto("A", "Arroz", {date(2026, 10, 5): 1})}
+        self.assertEqual(primera_semana_completa(productos), date(2026, 10, 5))
 
 
 if __name__ == "__main__":
