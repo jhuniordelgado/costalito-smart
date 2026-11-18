@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Sesion } from '../../core/sesion';
 
 interface OpcionMenu {
   ruta: string;
@@ -13,6 +14,10 @@ interface OpcionMenu {
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
+  readonly sesion = inject(Sesion);
+  private readonly router = inject(Router);
+  readonly saliendo = signal(false);
+
   opciones: OpcionMenu[] = [
     { ruta: '/', nombre: 'Mi jornada' },
     { ruta: '/ventas', nombre: 'Ventas' },
@@ -25,4 +30,16 @@ export class Sidebar {
     { ruta: '/inteligencia', nombre: 'Señales del negocio' },
     { ruta: '/administracion', nombre: 'Ajustes' },
   ];
-} 
+
+  async salir(): Promise<void> {
+    this.saliendo.set(true);
+    try {
+      await this.sesion.cerrarSesion();
+    } catch {
+      // aunque la API no responda, la sesión local ya se borró
+    } finally {
+      this.saliendo.set(false);
+      await this.router.navigateByUrl('/entrar');
+    }
+  }
+}

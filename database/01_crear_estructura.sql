@@ -228,6 +228,21 @@ BEGIN
 END;
 GO
 
+IF OBJECT_ID(N'dbo.Usuarios', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Usuarios (
+        UsuarioId INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_Usuarios PRIMARY KEY,
+        Cedula NVARCHAR(20) NOT NULL CONSTRAINT UQ_Usuarios_Cedula UNIQUE,
+        Nombre NVARCHAR(100) NOT NULL,
+        ContrasenaHash NVARCHAR(300) NOT NULL,
+        Rol NVARCHAR(20) NOT NULL CONSTRAINT DF_Usuarios_Rol DEFAULT (N'ADMIN'),
+        Activo BIT NOT NULL CONSTRAINT DF_Usuarios_Activo DEFAULT (1),
+        FechaCreacion DATETIME2(0) NOT NULL CONSTRAINT DF_Usuarios_FechaCreacion DEFAULT (SYSDATETIME()),
+        CONSTRAINT CK_Usuarios_Rol CHECK (Rol IN (N'ADMIN', N'VENDEDOR'))
+    );
+END;
+GO
+
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Ventas_FechaHora' AND object_id = OBJECT_ID(N'dbo.Ventas'))
     CREATE INDEX IX_Ventas_FechaHora ON dbo.Ventas(FechaHora);
 GO

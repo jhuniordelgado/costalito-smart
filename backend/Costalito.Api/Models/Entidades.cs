@@ -157,3 +157,14 @@ public sealed class ConfiguracionNegocio
     public TimeOnly HoraApertura { get; set; }
     public TimeOnly HoraCierre { get; set; }
 }
+
+public sealed class Usuario
+{
+    public int UsuarioId { get; set; }
+    public string Cedula { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public string ContrasenaHash { get; set; } = string.Empty;
+    public string Rol { get; set; } = "ADMIN";
+    public bool Activo { get; set; } = true;
+    public DateTime FechaCreacion { get; set; } = DateTime.Now;
+}

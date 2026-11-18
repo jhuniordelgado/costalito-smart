@@ -22,11 +22,17 @@
     }
   </nav>
 
+  @if (sesion.usuario(); as usuario) {
   <div class="user-card">
-    <div class="avatar">JC</div>
-    <div>
-      <strong>Administrador</strong>
-      <span>Granero Costalito</span>
+    <div class="avatar" aria-hidden="true">{{ sesion.iniciales() }}</div>
+    <div class="user-datos">
+      <strong>{{ usuario.nombre }}</strong>
+      <span>{{ usuario.rol === 'ADMIN' ? 'Administrador' : 'Vendedor' }}</span>
     </div>
+    <button type="button" class="salir" (click)="salir()" [disabled]="saliendo()"
+            title="Cerrar sesión" aria-label="Cerrar sesión">
+      Salir
+    </button>
   </div>
+  }
 </aside> 

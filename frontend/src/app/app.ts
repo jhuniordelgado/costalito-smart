@@ -1,17 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DatosGranero } from './core/datos-granero';
-import { Sidebar } from './shared/sidebar/sidebar';
 import { ListaAvisos } from './shared/lista-avisos/lista-avisos';
 
-// Aquí no hay lógica, solo armamos las tres piezas que siempre están a la vista:
-// el menú, el hueco donde cambian las páginas (RouterOutlet) y los avisos flotando.
+// Aquí no hay lógica: el RouterOutlet muestra la entrada o el marco del granero
+// (ver app.routes.ts) y los avisos flotan encima de todo.
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar, ListaAvisos],
+  imports: [RouterOutlet, ListaAvisos],
   templateUrl: './app.html',
-  styleUrl: './app.css',
 })
-export class App {
-  readonly datos = inject(DatosGranero);
-}
+export class App {}

@@ -19,20 +19,21 @@
       <div>
         <p class="eyebrow">Instalación nueva</p>
         <h2 id="titulo-entrada">Crea el administrador</h2>
-        <p class="sub">El sistema todavía no tiene usuarios. Esta persona podrá crear a los demás desde Ajustes.</p>
+        <p class="sub">El sistema todavía no tiene usuarios. Con esta cuenta entrarás a manejar el granero.</p>
       </div>
 
       <div class="campo" [class.invalido]="erroresAdministrador().cedula">
         <label for="admin-cedula">Cédula</label>
         <input id="admin-cedula" name="cedula" class="entrada" type="text" inputmode="numeric"
                autocomplete="username" [attr.maxlength]="cedulaMaxima" placeholder="Solo números"
-               (input)="alEscribirCedulaAdministrador($event)" [attr.aria-invalid]="erroresAdministrador().cedula ? 'true' : null">
+               (beforeinput)="antesDeEscribirCedulaAdministrador($event)" (input)="alEscribirCedulaAdministrador($event)" [attr.aria-invalid]="erroresAdministrador().cedula ? 'true' : null">
         @if (erroresAdministrador().cedula; as e) { <p class="campo-mensaje error" role="alert">{{ e }}</p> }
       </div>
 
       <div class="campo" [class.invalido]="erroresAdministrador().nombre">
         <label for="admin-nombre">Nombre completo</label>
         <input id="admin-nombre" name="nombre" class="entrada" type="text" maxlength="100" autocomplete="name"
+               placeholder="Solo letras" (beforeinput)="antesDeEscribirNombre($event)" (input)="alEscribirNombre($event)"
                [attr.aria-invalid]="erroresAdministrador().nombre ? 'true' : null">
         @if (erroresAdministrador().nombre; as e) { <p class="campo-mensaje error" role="alert">{{ e }}</p> }
       </div>
@@ -74,7 +75,7 @@
         <input #campoCedula id="cedula" name="cedula" class="entrada" type="text"
                inputmode="numeric" autocomplete="username" autocapitalize="off" spellcheck="false"
                [attr.maxlength]="cedulaMaxima" placeholder="Solo números"
-               [value]="cedula()" (input)="alEscribirCedula($event)"
+               [value]="cedula()" (beforeinput)="antesDeEscribirCedula($event)" (input)="alEscribirCedula($event)"
                [attr.aria-invalid]="errorCedula() ? 'true' : null"
                aria-describedby="ayuda-cedula">
         <p id="ayuda-cedula" class="campo-mensaje" [class.error]="errorCedula()" [attr.role]="errorCedula() ? 'alert' : null">

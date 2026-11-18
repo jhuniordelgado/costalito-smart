@@ -18,6 +18,7 @@ public sealed class CostalitoDbContext(DbContextOptions<CostalitoDbContext> opti
     public DbSet<Gasto> Gastos => Set<Gasto>();
     public DbSet<AjusteInventario> AjustesInventario => Set<AjusteInventario>();
     public DbSet<ConfiguracionNegocio> ConfiguracionNegocio => Set<ConfiguracionNegocio>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -92,6 +93,11 @@ public sealed class CostalitoDbContext(DbContextOptions<CostalitoDbContext> opti
         {
             entity.ToTable("ConfiguracionNegocio");
             entity.HasKey(configuracion => configuracion.ConfiguracionId);
+        });
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.ToTable("Usuarios");
+            entity.HasIndex(usuario => usuario.Cedula).IsUnique();
         });
     }
 }

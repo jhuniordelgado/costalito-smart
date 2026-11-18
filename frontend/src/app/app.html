@@ -1,23 +1,5 @@
-<!-- Este enlace no se ve; aparece al darle Tab y sirve para brincarse el menú -->
-<a class="saltar" href="#contenido">Saltar al contenido</a>
-
-<div class="app-shell">
-  <app-sidebar />
-
-  <!-- Aquí se pinta la página: Mi jornada, Ventas, Inventario... según la ruta -->
-  <main class="main-content" id="contenido" tabindex="-1">
-    @if (datos.errorConexion()) {
-      <div class="connection-warning" role="alert">
-        <span>{{ datos.errorConexion() }}</span>
-        <button type="button" (click)="datos.cargar()">Reintentar</button>
-      </div>
-    }
-    @if (datos.cargando()) {
-      <p class="connection-loading" role="status">Conectando con Costalito Smart…</p>
-    }
-    <router-outlet />
-  </main>
-</div>
+<!-- La pantalla de entrada o el marco del granero, según la ruta -->
+<router-outlet />
 
 <!-- Los papelitos de "venta registrada", "error", etc. -->
 <app-lista-avisos />
