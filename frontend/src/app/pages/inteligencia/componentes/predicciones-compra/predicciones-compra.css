@@ -31,7 +31,7 @@
 
 /* Lista de productos */
 .ia-lista { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
-.ia-item { display: grid; grid-template-columns: minmax(190px, 1fr) minmax(220px, 1.25fr) 230px; gap: 8px 24px; align-items: center; padding: 16px 20px; background: var(--papel); border: 1px solid var(--trazo); border-left: 6px solid var(--trazo); }
+.ia-item { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(200px, 250px); gap: 8px 24px; align-items: center; padding: 16px 20px; background: var(--papel); border: 1px solid var(--trazo); border-left: 6px solid var(--trazo); }
 .ia-item--agotado { border-left-color: var(--arcilla-oscura); background: linear-gradient(90deg, #fbeee9, var(--papel) 30%); }
 .ia-item--alta { border-left-color: var(--arcilla); }
 .ia-item--media { border-left-color: var(--mostaza); }
@@ -45,12 +45,12 @@
 .ia-explicacion { grid-column: 1 / -1; margin: 4px 0 0; padding-top: 10px; color: var(--gris-suave); border-top: 1px dashed var(--trazo); font-size: 0.92rem; line-height: 1.45; }
 
 /* Barras: 4 semanas vendidas (verde) y la prevista (mostaza con rayas) */
-.ia-grafica { margin: 0; }
-.ia-barras { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-items: end; height: 92px; }
-.ia-barra { display: grid; grid-template-rows: auto 1fr auto; height: 100%; text-align: center; }
+.ia-grafica { min-width: 0; margin: 0; }
+.ia-barras { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; align-items: end; height: 92px; }
+.ia-barra { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; height: 100%; text-align: center; }
 .ia-barra-valor { color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.72rem; line-height: 1.2; }
 .ia-barra-relleno { align-self: end; width: 100%; min-height: 3px; background: #8fae9c; border-top: 2px solid var(--verde-monte); transition: height 0.25s ease; }
-.ia-barra-etiqueta { padding-top: 3px; color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.68rem; white-space: nowrap; border-top: 1px solid var(--tinta); }
+.ia-barra-etiqueta { overflow: hidden; padding-top: 3px; color: var(--gris-suave); font-family: var(--fuente-ticket); font-size: 0.66rem; white-space: nowrap; text-overflow: clip; border-top: 1px solid var(--tinta); }
 .ia-barra--prevista .ia-barra-relleno { background: repeating-linear-gradient(-45deg, var(--mostaza), var(--mostaza) 4px, #f3df9c 4px, #f3df9c 8px); border-top-color: #85600a; }
 .ia-barra--prevista .ia-barra-valor, .ia-barra--prevista .ia-barra-etiqueta { color: #85600a; font-weight: 700; }
 .ia-grafica figcaption { margin-top: 4px; color: var(--gris-suave); font-size: 0.74rem; text-align: right; }
@@ -61,7 +61,7 @@
 .ia-sin-datos strong { color: var(--tinta); }
 
 @media (prefers-reduced-motion: reduce) { .ia-barra-relleno { transition: none; } }
-@media (max-width: 1100px) { .ia-item { grid-template-columns: minmax(0, 1fr) 210px; }.ia-decision { grid-column: 1; grid-row: 2; }.ia-grafica { grid-column: 2; grid-row: 1 / span 2; } }
+@media (max-width: 1100px) { .ia-item { grid-template-columns: minmax(0, 1fr) minmax(190px, 230px); }.ia-decision { grid-column: 1; grid-row: 2; }.ia-grafica { grid-column: 2; grid-row: 1 / span 2; } }
 @media (max-width: 760px) { .ia-resumen { grid-template-columns: repeat(3, 1fr); }.ia-resumen-metodo { grid-column: 1 / -1; border-top: 1px dashed var(--trazo); border-right: 0; }.ia-item { grid-template-columns: 1fr; }.ia-decision, .ia-grafica { grid-column: 1; grid-row: auto; }.ia-grafica { max-width: 320px; } }
 @media (max-width: 420px) { .ia-resumen-celda { padding: 12px; }.ia-resumen dd { font-size: 1.7rem; }.ia-acciones { width: 100%; justify-content: space-between; } }
 

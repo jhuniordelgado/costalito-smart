@@ -2,27 +2,54 @@
   <article class="tirilla">
     <div class="tirilla-titulo">Costalito · corte parcial</div>
     <div class="tirilla-linea"><span>Ventas</span><span>{{ datos.cantidadHoy() }}</span></div>
-    <div class="tirilla-linea"><span>Frente a ayer</span><span>↑ {{ pesos(datos.diferenciaAyer()) }}</span></div>
+    <div class="tirilla-linea"><span>Ticket promedio</span><span>{{ pesos(datos.ticketPromedio()) }}</span></div>
+    <div class="tirilla-linea">
+      <span>Frente a ayer</span>
+      <span [class.baja]="datos.diferenciaAyer() < 0">{{ datos.diferenciaAyer() >= 0 ? '↑ ' : '↓ ' }}{{ pesos(abs(datos.diferenciaAyer())) }}</span>
+    </div>
     <div class="tirilla-total"><span>TOTAL</span><strong>{{ pesos(datos.totalHoy()) }}</strong></div>
-    <div class="tirilla-gracias">Gracias por su compra</div>
+    <div class="tirilla-gracias">Comparado con ayer a esta misma hora</div>
   </article>
 
-  <div class="grafica" aria-label="Ritmo de ventas de hoy">
-    <p class="grafica-titulo">Ritmo de la jornada</p>
-    <div class="barras">
-      @for (bloque of datos.ritmo(); track bloque.hora) {
-      <span [style.height.%]="bloque.porcentaje" [attr.aria-label]="hora(bloque.hora) + ': ' + pesos(bloque.total)"></span>
+  <article class="pedir" aria-labelledby="titulo-pedir">
+    <header class="pedir-cabecera">
+      <div>
+        <p class="pedir-rotulo">Servicio inteligente</p>
+        <h3 id="titulo-pedir">Para pedir hoy</h3>
+      </div>
+      @if (ia.disponible()) {
+        <span class="pedir-conteo" [class.pedir-conteo--cero]="!ia.comprarHoy().length">{{ ia.comprarHoy().length }}</span>
       }
-    </div>
-    <div class="horas">
-      @for (bloque of datos.ritmo(); track bloque.hora) {
-      <b>{{ hora(bloque.hora) }}</b>
-      }
-    </div>
-  </div>
+    </header>
 
-  <aside class="post-it">
-    <p>Arroz, aceite y huevos están marcando el ritmo.</p>
-    <a routerLink="/ventas">Ver ventas del día →</a>
-  </aside>
-</section> 
+    @if (ia.estado(); as estado) {
+      @if (!estado.disponible) {
+        <p class="pedir-vacio">Las sugerencias de compra no están disponibles ahora. El resto de la jornada funciona normal.</p>
+      } @else if (ia.comprarHoy().length) {
+        <ul class="pedir-lista">
+          @for (producto of ia.comprarHoy().slice(0, 4); track producto.codigo) {
+            <li>
+              <span class="pedir-producto">
+                <strong>{{ producto.producto }}</strong>
+                <small>{{ producto.existencias <= 0 ? 'Agotado' : 'Quedan ' + formato(producto.existencias) }} · se venden ~{{ formato(producto.demandaSemanalPrevista) }} por semana</small>
+              </span>
+              <span class="pedir-cantidad">{{ formato(producto.cantidadSugerida) }} <small>und.</small></span>
+            </li>
+          }
+        </ul>
+        @if (ia.comprarHoy().length > 4) {
+          <p class="pedir-mas">Y {{ ia.comprarHoy().length - 4 }} más.</p>
+        }
+      } @else {
+        <p class="pedir-vacio">
+          Hoy no hay que pedir nada.
+          @if (ia.estaSemana().length) { Esta semana {{ plural(ia.estaSemana().length, 'toca pedir 1 producto', 'tocan ' + ia.estaSemana().length + ' productos') }}. }
+        </p>
+      }
+    } @else {
+      <p class="pedir-vacio">Consultando las sugerencias de compra…</p>
+    }
+
+    <a class="pedir-enlace" routerLink="/inteligencia" fragment="predicciones">Ver qué comprar y cuándo →</a>
+  </article>
+</section>

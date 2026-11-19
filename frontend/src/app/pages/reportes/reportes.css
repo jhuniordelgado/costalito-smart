@@ -1,0 +1,7 @@
+.primary-button[disabled] { opacity: 0.6; cursor: wait; transform: none; }
+.dia-fuerte { outline: 2px solid var(--mostaza); outline-offset: -2px; background: #fff8df; }
+.hallazgo-titulo { margin-top: 6px; }
+.hallazgo-texto { margin-top: 14px; color: var(--gris-suave); line-height: 1.6; }
+.hallazgo-ia { margin-top: 18px; padding: 14px 16px; background: #fff8df; border-left: 5px solid var(--mostaza); }
+.hallazgo-ia p { margin: 4px 0 0; line-height: 1.5; }
+.hallazgo-ia a { display: inline-block; margin-top: 8px; font-weight: 700; }

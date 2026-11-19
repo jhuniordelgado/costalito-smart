@@ -2,11 +2,12 @@
   display: block;
 }
 
+/* Dos piezas del mismo alto: la tirilla de caja y lo que hay que pedir hoy */
 .corte {
   display: grid;
-  grid-template-columns: minmax(250px, 0.8fr) minmax(0, 1.5fr) minmax(210px, 0.7fr);
-  gap: 34px;
-  align-items: start;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.6fr);
+  gap: 30px;
+  align-items: stretch;
   padding-bottom: 14px;
 }
 
@@ -73,87 +74,123 @@
   font-size: 12px;
 }
 
-.grafica {
-  padding: 20px 24px 16px;
+.tirilla {
+  align-self: start;
+}
+
+.tirilla-linea .baja {
+  color: var(--arcilla-oscura);
+}
+
+/* Para pedir hoy: lo que sugiere el servicio inteligente */
+.pedir {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px 20px;
   background: var(--papel);
   border: 1px solid var(--trazo);
-  border-left: 4px double var(--margen);
+  border-top: 5px solid var(--arcilla);
   box-shadow: 0 10px 22px -16px rgba(24, 35, 30, 0.5);
 }
 
-.grafica-titulo {
-  margin: 0 0 14px;
-  color: var(--arcilla);
-  font-family: var(--letra-mano);
-  font-size: 19px;
-}
-
-.barras {
+.pedir-cabecera {
   display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  height: 170px;
-  padding: 0 4px;
-  border-bottom: 2px solid var(--tinta);
-  background-image: linear-gradient(to bottom, transparent 41px, var(--renglon) 41px, var(--renglon) 42px);
-  background-size: 100% 42px;
-}
-
-  .barras span {
-    flex: 1;
-    min-width: 10px;
-    background: var(--mostaza);
-    border: 2px solid var(--tinta);
-    border-bottom: 0;
-    border-radius: 3px 3px 0 0;
-  }
-
-    .barras span:nth-child(3n) {
-      background: #e48b63;
-    }
-
-.horas {
-  display: flex;
+  align-items: start;
   justify-content: space-between;
-  margin-top: 8px;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--trazo);
+}
+
+.pedir-rotulo {
+  margin: 0;
   color: var(--gris-suave);
-  font-family: var(--letra-mano);
-  font-size: 16px;
+  font-family: var(--fuente-ticket);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
-.post-it {
-  position: relative;
-  padding: 28px 22px 22px;
-  background: #f4dc7c;
-  box-shadow: 0 12px 18px -12px rgba(0, 0, 0, 0.5);
-  transform: rotate(2.5deg);
+.pedir-cabecera h3 {
+  margin: 2px 0 0;
+  font-size: 1.6rem;
 }
 
-  .post-it::before {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    width: 70px;
-    height: 20px;
-    margin-left: -35px;
-    background: rgba(255, 255, 255, 0.55);
-    transform: rotate(-2deg);
-  }
+.pedir-conteo {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 8px;
+  color: #fff;
+  background: var(--arcilla);
+  border-radius: 999px;
+  font-family: var(--fuente-ticket);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
 
-  .post-it p {
-    margin: 0 0 14px;
-    font-family: var(--letra-mano);
-    font-size: 22px;
-    line-height: 1.2;
-  }
+.pedir-conteo--cero {
+  background: var(--verde-monte);
+}
 
-  .post-it a {
-    color: var(--arcilla);
-    font-family: var(--letra-mano);
-    font-size: 18px;
-    text-underline-offset: 4px;
-  }
+.pedir-lista {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pedir-lista li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--trazo);
+}
+
+.pedir-producto {
+  min-width: 0;
+}
+
+.pedir-producto strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.pedir-producto small {
+  color: var(--gris-suave);
+  font-size: 0.88rem;
+}
+
+.pedir-cantidad {
+  color: var(--arcilla-oscura);
+  font-family: var(--fuente-ticket);
+  font-size: 1.35rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pedir-cantidad small {
+  font-size: 0.8rem;
+}
+
+.pedir-vacio,
+.pedir-mas {
+  margin: 14px 0 0;
+  color: var(--gris-suave);
+  line-height: 1.5;
+}
+
+.pedir-enlace {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 14px;
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
 
 @media (max-width: 1050px) {
   .corte {
@@ -161,7 +198,4 @@
     gap: 30px;
   }
 
-  .post-it {
-    max-width: 340px;
-  }
 }

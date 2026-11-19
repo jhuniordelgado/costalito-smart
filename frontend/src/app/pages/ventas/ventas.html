@@ -13,7 +13,9 @@
     <div>
       <p>Ventas de hoy</p>
       <strong>{{ pesos(datos.totalHoy()) }}</strong>
-      <small class="positive">↑ {{ datos.porcentajeAyer() }}% frente a ayer</small>
+      <small [class.positive]="datos.porcentajeAyer() >= 0" [class.warning]="datos.porcentajeAyer() < 0">
+        {{ datos.porcentajeAyer() >= 0 ? '↑' : '↓' }} {{ datos.porcentajeAyer() < 0 ? -datos.porcentajeAyer() : datos.porcentajeAyer() }} % frente a ayer a esta hora
+      </small>
     </div>
   </article>
   <article class="metric-card">

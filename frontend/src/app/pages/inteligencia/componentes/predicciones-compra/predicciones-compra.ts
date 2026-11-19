@@ -13,7 +13,11 @@ const URGENCIAS: Record<UrgenciaIa, { rotulo: string; sello: string; clase: stri
 };
 
 const numero = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 });
-const fechaCorta = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short' });
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+/** "19 oct": corto para que quepa debajo de una barra (Intl en es-CO escribe "19 de oct"). */
+function fechaCorta(fecha: Date): string {
+  return `${fecha.getDate()} ${MESES[fecha.getMonth()]}`;
+}
 
 interface Barra {
   etiqueta: string;
@@ -103,7 +107,7 @@ export class PrediccionesCompra {
       if (lunes && !prevista) {
         const dia = new Date(lunes);
         dia.setDate(dia.getDate() + 7 * indice);
-        etiqueta = fechaCorta.format(dia).replace('.', '');
+        etiqueta = fechaCorta(dia);
       }
       return { etiqueta, valor, altura: Math.max(4, Math.round((valor / mayor) * 100)), prevista };
     });
@@ -119,7 +123,7 @@ export class PrediccionesCompra {
   }
 
   fecha(valor: string): string {
-    return fechaCorta.format(this.aFecha(valor)).replace('.', '');
+    return fechaCorta(this.aFecha(valor));
   }
 
   hora(valor: Date): string {

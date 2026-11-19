@@ -55,28 +55,20 @@ export class DatosGranero {
   readonly cantidadHoy = computed(() => this.ventasHoy().length);
   readonly ticketPromedio = computed(() =>
     this.cantidadHoy() ? Math.round(this.totalHoy() / this.cantidadHoy()) : 0);
-  readonly ventasAyerHastaAhora = computed(() =>
-    this.ventasAyer().reduce((total, venta) => total + venta.total, 0));
+  // Ayer hasta la misma hora de hoy: comparar lo que va de hoy con todo el día de ayer
+  // siempre daría "vamos peor" por la mañana. Se recalcula cada vez que entra una venta.
+  readonly ventasAyerHastaAhora = computed(() => {
+    this.ventasHoy();
+    const ahora = new Date();
+    const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
+    return this.ventasAyer()
+      .filter((venta) => venta.hora.getHours() * 60 + venta.hora.getMinutes() <= minutosAhora)
+      .reduce((total, venta) => total + venta.total, 0);
+  });
   readonly diferenciaAyer = computed(() => this.totalHoy() - this.ventasAyerHastaAhora());
   readonly porcentajeAyer = computed(() => this.ventasAyerHastaAhora()
     ? Math.round((this.diferenciaAyer() / this.ventasAyerHastaAhora()) * 100)
     : 0);
-
-  readonly ritmo = computed(() => {
-    const horas = Array.from({ length: 9 }, (_, index) => index + 8);
-    const bloques = horas.map((hora) => ({ hora, total: 0 }));
-
-    for (const venta of this.ventasHoy()) {
-      const indice = Math.min(Math.max(venta.hora.getHours() - 8, 0), bloques.length - 1);
-      bloques[indice].total += venta.total;
-    }
-
-    const mayor = Math.max(...bloques.map((bloque) => bloque.total), 1);
-    return bloques.map((bloque) => ({
-      ...bloque,
-      porcentaje: Math.round((bloque.total / mayor) * 100),
-    }));
-  });
 
   readonly topProductos = computed(() => {
     const vendidos = new Map<number, { nombre: string; unidades: number; monto: number }>();

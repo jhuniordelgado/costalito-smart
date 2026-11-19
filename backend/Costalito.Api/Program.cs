@@ -18,7 +18,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("Configura ConnectionStrings:Costalito antes de iniciar la API.");
 
 builder.Services.AddDbContext<CostalitoDbContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddControllers();
+// MensajesValidacion: los errores de [Required], [Range]... salen en español
+builder.Services.AddControllers(MensajesValidacion.Registrar);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Sesión con cookie HttpOnly. Como es una API, en vez de redirigir a una página de
@@ -95,11 +96,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
     {
-        var message = context.ModelState.Values
-            .SelectMany(value => value.Errors)
-            .Select(error => error.ErrorMessage)
-            .FirstOrDefault(error => !string.IsNullOrWhiteSpace(error))
-            ?? "Revisa los datos enviados.";
+        var message = MensajesValidacion.PrimerMensaje(context.ModelState);
         return new BadRequestObjectResult(new ErrorDto(
             message, StatusCodes.Status400BadRequest, context.HttpContext.TraceIdentifier));
     };

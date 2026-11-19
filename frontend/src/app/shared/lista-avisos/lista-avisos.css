@@ -1,42 +1,88 @@
+/* Avisos que aparecen abajo a la derecha (venta registrada, reporte descargado, errores...).
+   Fondo sólido, borde marcado y una etiqueta con el tipo, para que se lean de un vistazo. */
 .lista-avisos {
   position: fixed;
-  z-index: 20;
+  z-index: 50;
   right: 24px;
   bottom: 24px;
   display: grid;
-  gap: 10px;
-  width: min(380px, calc(100vw - 32px));
+  gap: 12px;
+  width: min(400px, calc(100vw - 32px));
 }
 
 .aviso {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 15px 16px;
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--moss);
-  background: var(--paper);
-  box-shadow: 0 12px 28px rgba(23, 49, 40, 0.16);
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 16px 14px 16px 16px;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 2px solid var(--tinta);
+  border-left-width: 8px;
+  border-radius: var(--radio);
+  box-shadow: 0 5px 0 rgba(24, 35, 30, 0.85), 0 18px 32px -12px rgba(24, 35, 30, 0.55);
+  animation: aviso-entra 0.22s ease-out;
 }
 
-.aviso.exito { border-left-color: var(--color-exito); }
-.aviso.informacion { border-left-color: var(--sun); }
-.aviso.error { border-left-color: var(--color-error); }
+/* Sello circular con el símbolo del tipo; el texto del aviso sigue diciendo qué pasó */
+.aviso::before {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
 
-.aviso strong { display: block; color: var(--ink); }
-.aviso p { margin: 4px 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
+.aviso.exito { background: #f1f8f0; border-color: #1d633d; }
+.aviso.exito::before { content: "✓"; background: #1d633d; }
+.aviso.informacion { background: #fff8df; border-color: #85600a; }
+.aviso.informacion::before { content: "i"; background: #85600a; font-family: var(--fuente-titulo); }
+.aviso.error { background: #fbeee9; border-color: var(--arcilla-oscura); }
+.aviso.error::before { content: "!"; background: var(--arcilla-oscura); }
+
+.aviso strong {
+  display: block;
+  font-family: var(--fuente-titulo);
+  font-size: 1.12rem;
+  line-height: 1.25;
+}
+
+.aviso p {
+  margin: 4px 0 0;
+  color: #2f3b35;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
 
 .aviso button {
-  align-self: start;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  color: var(--muted);
+  color: var(--tinta);
   cursor: pointer;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   line-height: 1;
 }
 
 .aviso button:hover,
-.aviso button:focus-visible { color: var(--ink); }
+.aviso button:focus-visible { background: rgba(24, 35, 30, 0.1); }
+
+@keyframes aviso-entra {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso { animation: none; }
+}
+
+@media (max-width: 560px) {
+  .lista-avisos { right: 16px; bottom: 16px; }
+}
