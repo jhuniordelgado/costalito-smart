@@ -14,7 +14,6 @@ Las respuestas se transcribieron con Whisper y se organizaron por pregunta. El d
 
 Hallazgos principales: registrar cantidades, códigos, presentaciones, precios y vencimientos; documentar pérdidas y devoluciones; gestionar facturas de compra, proveedores, abonos y saldos; calcular ventas con varios productos; consultar los fiados por cliente; registrar gastos y consultar movimientos por período. La entrevista indicó márgenes habituales del 10 % por unidad y 5 % al por mayor. El prototipo cubre una parte de estos requisitos; gastos, devoluciones y reportes completos quedan pendientes.
 
-> **Datos por completar:** el material fuente conserva `[nombre del negocio]` y `[nombre del propietario]` como marcadores. Deben reemplazarse antes de entregar el documento final.
 
 ## Arquitectura
 
@@ -38,7 +37,16 @@ La separación corresponde a una arquitectura por capas: la interfaz presenta lo
 
 La interfaz carga el estado inicial desde `/api/bootstrap` y envía operaciones de ventas, productos, clientes, proveedores, compras, abonos y configuración a la API. Las respuestas exitosas actualizan la vista; los errores de validación o conexión se muestran al usuario. La API documenta sus rutas en Swagger.
 
-La conexión local predeterminada del frontend apunta a `http://localhost:5257/api`. Para cambiarla, edita `API_URL` en `frontend/src/app/core/datos-granero.ts`.
+La conexión local predeterminada del frontend apunta a `http://localhost:5257/api`. Para cambiarla, edita `API_URL` en `frontend/src/app/core/api.ts`.
+
+## Inicio de sesión
+
+Todas las pantallas del granero exigen sesión. La ruta `/entrar` muestra el formulario de cédula y contraseña; las demás rutas cuelgan del marco `Principal`, protegido por la guarda `requiereSesion`.
+
+- **Primer arranque:** si la tabla `Usuarios` está vacía, la pantalla de entrada muestra "Crea el administrador". La API (`POST /api/setup/admin`) solo acepta esa creación mientras no exista ningún usuario; después responde 409.
+- **Entrar y salir:** `POST /api/auth/login` valida la cédula y la contraseña y devuelve una cookie `HttpOnly` (`costalito.sesion`, 12 horas, renovable). `GET /api/auth/me` restaura la sesión al recargar la página y `POST /api/auth/logout` la cierra desde el botón **Salir** del menú.
+- **Protección de la API:** todas las rutas exigen sesión salvo `/api/health`, `/api/setup` y `/api/auth/login`. Sin sesión responden 401 y Angular vuelve a `/entrar`.
+- **Validación Fail-Fast:** el formulario revisa los datos en el navegador antes de enviarlos (`core/validaciones.ts`) y la API repite las mismas reglas (`AutenticacionService`). Las contraseñas se guardan con el hash de ASP.NET Core Identity (PBKDF2) y los intentos de entrada se limitan a 10 por minuto por IP.
 
 ## Requisitos
 
@@ -81,7 +89,7 @@ Los escenarios solicitados y el estado de verificación están en [`docs/pruebas
 
 ## Seguridad y datos
 
-No guardar credenciales reales en el repositorio. `appsettings.Development.json`, secretos, `bin/` y `obj/` están excluidos por `.gitignore`. Los datos del script SQL son únicamente para demostración.
+No guardar credenciales reales en el repositorio. `appsettings.Development.json`, secretos, `bin/` y `obj/` están excluidos por `.gitignore`. Los datos del script SQL son únicamente para demostración. El script no crea usuarios: el administrador se crea desde la pantalla de entrada en el primer arranque.
 
 ## Equipo
 

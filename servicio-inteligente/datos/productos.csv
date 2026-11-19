@@ -1,0 +1,15 @@
+codigo,nombre,existencias,stock_minimo
+ABA-001,Arroz Diana 500 g,86,30
+ABA-002,Frijol cargamanto 500 g,33,12
+ABA-003,Panela cuadrada,40,15
+ABA-004,Sal 500 g,50,15
+ABA-005,Aceite vegetal 1 L,24,18
+ABA-006,Café de Huila 250 g,28,12
+LAC-001,Leche entera 1 L,8,10
+LAC-002,Queso campesino 500 g,14,6
+ALI-001,Huevos AA x 30,35,15
+ALI-002,Pan tajado,12,6
+BEB-001,"Gaseosa 1,5 L",30,12
+BEB-002,Jugo de naranja 1 L,22,10
+ASE-001,Jabón líquido 1 L,17,8
+ASE-002,Papel higiénico x 4,20,8

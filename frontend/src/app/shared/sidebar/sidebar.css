@@ -130,6 +130,39 @@
   font-size: 14px;
 }
 
+.user-datos {
+  flex: 1;
+  min-width: 0;
+}
+
+  .user-datos strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+.salir {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border: 1px solid rgba(223, 184, 63, 0.6);
+  border-radius: var(--radio);
+  background: transparent;
+  color: #f3efe2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+  .salir:hover {
+    color: var(--tinta);
+    background: var(--mostaza);
+  }
+
+  .salir[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
 .user-card span {
   margin-top: 1px;
   color: #aab3aa;
@@ -153,6 +186,15 @@
     .user-card > div:not(.avatar) {
       display: none;
     }
+
+  .user-card {
+    flex-direction: column;
+  }
+
+  .salir {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
 
   .menu a, .user-card {
     justify-content: center;
@@ -201,9 +243,17 @@
     border: 0;
   }
 
-    .brand > div:not(.brand-icon), .user-card {
+    .brand > div:not(.brand-icon), .user-card > :not(.salir) {
       display: none;
     }
+
+  /* en celular solo queda el botón Salir, al final de la barra */
+  .user-card {
+    order: 3;
+    margin: 0 0 0 8px;
+    padding: 0;
+    border: 0;
+  }
 
   .menu {
     display: flex;

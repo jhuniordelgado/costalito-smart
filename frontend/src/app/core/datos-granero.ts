@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import {
@@ -6,9 +6,8 @@ import {
   NuevaCompra, NuevaVenta, NuevoCliente, NuevoProducto, NuevoProveedor, Producto,
   Proveedor, Senal, Venta,
 } from './modelos';
-import { pesos, plural } from './formato';
-
-const API_URL = 'http://localhost:5257/api';
+import { API_URL } from './api';
+import { mensajeDe, pesos, plural } from './formato';
 
 interface DatosIniciales {
   granero: Granero;
@@ -40,10 +39,6 @@ export class DatosGranero {
   readonly abonos = signal<Abono[]>([]);
   readonly cargando = signal(true);
   readonly errorConexion = signal('');
-
-  constructor() {
-    void this.cargar();
-  }
 
   readonly ventasHoy = computed(() => this.ventas().filter((venta) => this.esHoy(venta.hora)));
   readonly ventasAyer = computed(() => {
@@ -228,7 +223,7 @@ export class DatosGranero {
       this.compras.set(datos.compras.map((compra) => ({ ...compra, fecha: this.parseFechaCompra(compra.fecha) })));
       this.abonos.set(datos.abonos.map((abono) => ({ ...abono, fecha: new Date(abono.fecha) })));
     } catch (error) {
-      this.errorConexion.set(this.detalleError(error));
+      this.errorConexion.set(mensajeDe(error));
     } finally {
       this.cargando.set(false);
     }
@@ -333,29 +328,8 @@ export class DatosGranero {
     try {
       return await firstValueFrom(request);
     } catch (error) {
-      throw new Error(this.detalleError(error));
+      throw new Error(mensajeDe(error));
     }
-  }
-
-  private detalleError(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      const mensaje = error.error?.error;
-      const detalle = error.error?.detalle;
-      if (typeof mensaje === 'string' && typeof detalle === 'string') {
-        // La API solo manda el detalle técnico en Development; ayuda a encontrar
-        // fallos de SQL sin mostrar excepciones internas a usuarios del despliegue.
-        const lineaUtil = detalle.split(/\r?\n/)
-          .map((linea: string) => linea.trim())
-          .find((linea: string) => /Exception:|error SQL|Cannot|Invalid|Violation|The .* statement conflicted/i.test(linea));
-        return lineaUtil ? `${mensaje} (${lineaUtil.slice(0, 240)})` : mensaje;
-      }
-      if (typeof mensaje === 'string') return mensaje;
-      if (error.status === 0) {
-        return 'No hay conexión con el servidor. Revisa que el backend esté iniciado e inténtalo de nuevo.';
-      }
-      return 'No se pudo completar la operación. Inténtalo de nuevo.';
-    }
-    return error instanceof Error ? error.message : 'Ocurrió un problema inesperado.';
   }
 
   private esHoy(fecha: Date): boolean {

@@ -1,0 +1,117 @@
+<div class="entrada-pantalla">
+  <aside class="entrada-marca" aria-label="Costalito Smart">
+    <div class="marca-logo">
+      <img src="brand/costalito-logo.jpg" alt="Logo de Costalito Smart">
+    </div>
+    <h1>Costalito Smart</h1>
+    <p class="marca-lema">El pulso de tu granero</p>
+
+    <ul class="marca-lista">
+      <li>Ventas y fiados al día</li>
+      <li>Existencias que avisan solas</li>
+      <li>Compras y proveedores en orden</li>
+    </ul>
+  </aside>
+
+  <section class="entrada-formulario" aria-labelledby="titulo-entrada">
+    @if (necesitaAdministrador()) {
+    <form class="papel-libreta formulario" (submit)="crearAdministrador($event)" novalidate>
+      <div>
+        <p class="eyebrow">Instalación nueva</p>
+        <h2 id="titulo-entrada">Crea el administrador</h2>
+        <p class="sub">El sistema todavía no tiene usuarios. Con esta cuenta entrarás a manejar el granero.</p>
+      </div>
+
+      <div class="campo" [class.invalido]="erroresAdministrador().cedula">
+        <label for="admin-cedula">Cédula</label>
+        <input id="admin-cedula" name="cedula" class="entrada" type="text" inputmode="numeric"
+               autocomplete="username" [attr.maxlength]="cedulaMaxima" placeholder="Solo números"
+               (beforeinput)="antesDeEscribirCedulaAdministrador($event)" (input)="alEscribirCedulaAdministrador($event)" [attr.aria-invalid]="erroresAdministrador().cedula ? 'true' : null">
+        @if (erroresAdministrador().cedula; as e) { <p class="campo-mensaje error" role="alert">{{ e }}</p> }
+      </div>
+
+      <div class="campo" [class.invalido]="erroresAdministrador().nombre">
+        <label for="admin-nombre">Nombre completo</label>
+        <input id="admin-nombre" name="nombre" class="entrada" type="text" maxlength="100" autocomplete="name"
+               placeholder="Solo letras" (beforeinput)="antesDeEscribirNombre($event)" (input)="alEscribirNombre($event)"
+               [attr.aria-invalid]="erroresAdministrador().nombre ? 'true' : null">
+        @if (erroresAdministrador().nombre; as e) { <p class="campo-mensaje error" role="alert">{{ e }}</p> }
+      </div>
+
+      <div class="campo" [class.invalido]="erroresAdministrador().contrasena">
+        <label for="admin-contrasena">Contraseña</label>
+        <input id="admin-contrasena" name="contrasena" class="entrada" type="password" autocomplete="new-password"
+               placeholder="Mínimo 8 caracteres" [attr.aria-invalid]="erroresAdministrador().contrasena ? 'true' : null">
+        @if (erroresAdministrador().contrasena; as e) { <p class="campo-mensaje error" role="alert">{{ e }}</p> }
+      </div>
+
+      <div class="campo" [class.invalido]="erroresAdministrador().repetir">
+        <label for="admin-repetir">Repite la contraseña</label>
+        <input id="admin-repetir" name="repetir" class="entrada" type="password" autocomplete="new-password"
+               [attr.aria-invalid]="erroresAdministrador().repetir ? 'true' : null">
+        @if (erroresAdministrador().repetir; as e) { <p class="campo-mensaje error" role="alert">{{ e }}</p> }
+      </div>
+
+      @if (errorServidor()) {
+        <p class="aviso-servidor" role="alert">{{ errorServidor() }}</p>
+      }
+
+      <div class="acciones">
+        <button class="boton boton--grande" type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Creando…' : 'Crear administrador y entrar' }}
+        </button>
+      </div>
+    </form>
+    } @else {
+    <form class="papel-libreta formulario" (submit)="entrar($event)" novalidate>
+      <div>
+        <p class="eyebrow">Abrir la jornada</p>
+        <h2 id="titulo-entrada">Entra a tu granero</h2>
+        <p class="sub">Escribe tu cédula y tu contraseña para registrar ventas y revisar el negocio.</p>
+      </div>
+
+      <div class="campo" [class.invalido]="errorCedula()">
+        <label for="cedula">Cédula</label>
+        <input #campoCedula id="cedula" name="cedula" class="entrada" type="text"
+               inputmode="numeric" autocomplete="username" autocapitalize="off" spellcheck="false"
+               [attr.maxlength]="cedulaMaxima" placeholder="Solo números"
+               [value]="cedula()" (beforeinput)="antesDeEscribirCedula($event)" (input)="alEscribirCedula($event)"
+               [attr.aria-invalid]="errorCedula() ? 'true' : null"
+               aria-describedby="ayuda-cedula">
+        <p id="ayuda-cedula" class="campo-mensaje" [class.error]="errorCedula()" [attr.role]="errorCedula() ? 'alert' : null">
+          {{ errorCedula() ?? 'Sin puntos ni espacios.' }}
+        </p>
+      </div>
+
+      <div class="campo" [class.invalido]="errorContrasena()">
+        <label for="contrasena">Contraseña</label>
+        <div class="campo-clave">
+          <input #campoContrasena id="contrasena" name="contrasena" class="entrada"
+                 [type]="verContrasena() ? 'text' : 'password'"
+                 autocomplete="current-password" autocapitalize="off" spellcheck="false"
+                 [value]="contrasena()" (input)="alEscribirContrasena($event)"
+                 [attr.aria-invalid]="errorContrasena() ? 'true' : null"
+                 [attr.aria-describedby]="errorContrasena() ? 'error-contrasena' : null">
+          <button type="button" class="ver-clave" (click)="verContrasena.set(!verContrasena())"
+                  [attr.aria-pressed]="verContrasena()" aria-controls="contrasena">
+            {{ verContrasena() ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        @if (errorContrasena()) {
+          <p id="error-contrasena" class="campo-mensaje error" role="alert">{{ errorContrasena() }}</p>
+        }
+      </div>
+
+      @if (errorServidor()) {
+        <p class="aviso-servidor" role="alert">{{ errorServidor() }}</p>
+      }
+
+      <div class="acciones">
+        <button class="boton boton--grande" type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Entrando…' : 'Entrar' }}
+        </button>
+      </div>
+    </form>
+    }
+  </section>
+</div>
